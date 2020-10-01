@@ -1,0 +1,54 @@
+@page "/movie/edit/{id:int}"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/movie" style="color:#6372C4">Movies</a>  /  @id</span>
+        </div>
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/movie/@id"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <MovieForm MovieVM="MovieVM" ecb_Save="Update" Type="Edit" @ref="Form"/>
+</div>
+
+    @code {
+
+        [Inject] public IMovieService MovieService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+        [Parameter] public int id { get; set; }
+
+        MovieVM MovieVM { get; set; } = new MovieVM();
+        protected MovieForm Form;
+
+        protected override async Task OnInitializedAsync()
+        {
+            MovieVM = await MovieService.GetMovie(id);
+        }
+
+        private async Task Save()
+        {
+            await Form.ParentSubmit();
+        }
+
+        private async Task Update()
+        {
+            MovieVM.Exception = null;
+            MovieVM updatedMovieVM = await MovieService.UpdateMovie(MovieVM.Movie.Id, MovieVM);
+
+            if (string.IsNullOrEmpty(updatedMovieVM.Exception))
+            {
+                await JSRuntime.Notfication($"Moviement {MovieVM.Movie.Name} has been updated successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                NavigationManager.NavigateTo($"/movie/{updatedMovieVM.Movie.Id}");
+            }
+            else
+            {
+                await JSRuntime.Notfication(updatedMovieVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+        }
+    }

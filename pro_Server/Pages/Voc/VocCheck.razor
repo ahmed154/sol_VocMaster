@@ -1,0 +1,60 @@
+@page "/voc/check"
+
+    <div class="container bg-white rounded border p-3">
+        <div class="pl-3">
+            <div class="row">
+                <span style="font-size:18px; color:#8f8f8f;"><a href="/voc" style="color:#6372C4">Vocs</a> /  @id</span>
+            </div>
+            <div class="row pt-4">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container bg-white border box-shadow p-3 rounded">
+        <VocForm VocVM="UserVocVM.VocVM" Type="Details" />
+    </div>
+
+
+    @code {
+
+        [Parameter] public int id { get; set; }
+        [Inject] public IUserVocService UserVocService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+
+        List<UserVocVM> UserVocVMs { get; set; }
+        UserVocVM UserVocVM { get; set; } = new UserVocVM();
+        int currentVoc { get; set; }
+        string str_Next { get; set; } = "Next";
+
+        protected override async Task OnInitializedAsync()
+        {
+            UserVocVM.UserName = await JSRuntime.GetFromLocalStorage("Email");
+
+            UserVocVMs = await UserVocService.GetVocCheck(UserVocVM);
+            if (UserVocVMs.Count > 0 && !string.IsNullOrEmpty(UserVocVMs[0].Exception))
+            {
+                await JSRuntime.Notfication(UserVocVMs[0].Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+
+            if (UserVocVMs.Count > 0)
+            {
+                UserVocVM = UserVocVMs[currentVoc];
+            }
+        }
+
+        protected async Task Next()
+        {
+            if (str_Next == "Next")
+            {
+                if (currentVoc == UserVocVMs.Count - 1) str_Next = "Pick New";
+
+                UserVocVM = UserVocVMs[currentVoc];
+            }
+            else if (str_Next == "Pick New")
+            {
+                NavigationManager.NavigateTo("picknew");
+            }
+        }
+    }

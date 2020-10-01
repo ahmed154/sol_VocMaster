@@ -1,0 +1,54 @@
+@page "/quote/edit/{id:int}"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/quote" style="color:#6372C4">Quotes</a>  /  @id</span>
+        </div>
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/quote/@id"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <QuoteForm QuoteVM="QuoteVM" ecb_Save="Update" Type="Edit" @ref="Form"/>
+</div>
+
+    @code {
+
+        [Inject] public IQuoteService QuoteService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+        [Parameter] public int id { get; set; }
+
+        QuoteVM QuoteVM { get; set; } = new QuoteVM();
+        protected QuoteForm Form;
+
+        protected override async Task OnInitializedAsync()
+        {
+            QuoteVM = await QuoteService.GetQuote(id);
+        }
+
+        private async Task Save()
+        {
+            await Form.ParentSubmit();
+        }
+
+        private async Task Update()
+        {
+            QuoteVM.Exception = null;
+            QuoteVM updatedQuoteVM = await QuoteService.UpdateQuote(QuoteVM.Quote.Id, QuoteVM);
+
+            if (string.IsNullOrEmpty(updatedQuoteVM.Exception))
+            {
+                await JSRuntime.Notfication($"Quotement {QuoteVM.Quote.Text} has been updated successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                NavigationManager.NavigateTo($"/quote/{updatedQuoteVM.Quote.Id}");
+            }
+            else
+            {
+                await JSRuntime.Notfication(updatedQuoteVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+        }
+    }

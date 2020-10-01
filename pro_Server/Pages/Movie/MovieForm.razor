@@ -1,0 +1,190 @@
+@using Syncfusion.Blazor.Inputs
+
+@inject NavigationManager Navigation
+
+<EditForm Model="MovieVM" Context="formContext">
+    <ObjectGraphDataAnnotationsValidator />
+
+    <div class="container border p-3">
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                <InputFile class="btn btn-info form-control" multiple OnChange="AddNewMovie">Add Movie</InputFile>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                <SfTextBox id="name" Placeholder="Name" Readonly="@bol_ReadOnly" FloatLabelType="@FloatLabelType.Auto" @bind-Value="@MovieVM.Movie.Name"></SfTextBox>
+                <ValidationMessage For="@(() => MovieVM.Movie.Name)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                <SfNumericTextBox Placeholder="Release Year" Readonly="@bol_ReadOnly" FloatLabelType="@FloatLabelType.Auto" @bind-Value="@MovieVM.Movie.ReleaseYear"></SfNumericTextBox>
+                <ValidationMessage For="@(() => MovieVM.Movie.ReleaseYear)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                <SfTextBox Placeholder="Poster Uri" Readonly="@bol_ReadOnly" FloatLabelType="@FloatLabelType.Auto" @bind-Value="@MovieVM.Movie.PosterUri"></SfTextBox>
+                <ValidationMessage For="@(() => MovieVM.Movie.PosterUri)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                <SfTextBox Placeholder="Trailer Uri" Readonly="@bol_ReadOnly" FloatLabelType="@FloatLabelType.Auto" @bind-Value="@MovieVM.Movie.TrailerUri"></SfTextBox>
+                <ValidationMessage For="@(() => MovieVM.Movie.TrailerUri)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                <SfTextBox Placeholder="Movie Uri" Readonly="@bol_ReadOnly" FloatLabelType="@FloatLabelType.Auto" @bind-Value="@MovieVM.Movie.MovierUri"></SfTextBox>
+                <ValidationMessage For="@(() => MovieVM.Movie.MovierUri)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                <SfTextBox Placeholder="Summary" Readonly="@bol_ReadOnly" FloatLabelType="@FloatLabelType.Auto" @bind-Value="@MovieVM.Movie.Summary"></SfTextBox>
+                <ValidationMessage For="@(() => MovieVM.Movie.Summary)" />
+            </div>
+        </div>
+    </div>
+
+    <button id="sub" type="submit" hidden @onclick=@(() => Submit(formContext))>Submit</button>
+</EditForm>
+
+@code { public Query Query = new Query();
+
+    [CascadingParameter] public MainLayout.AppParam appParam { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+
+    [Parameter] public MovieVM MovieVM { get; set; } = new MovieVM();
+    [Parameter] public EventCallback<MovieVM> ecb_Save { get; set; }
+
+    [Parameter] public string Type { get; set; }
+
+
+    protected bool bol_ReadOnly { get; set; } = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Type == "Details")
+            {
+                bol_ReadOnly = true;
+                StateHasChanged();
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("FocusElement", "name");
+            }
+        }
+    }
+
+    public async Task ParentSubmit()
+    {
+        await JSRuntime.InvokeVoidAsync("SubmitForm", "sub");
+    }
+
+    public async Task Submit(EditContext formContext)
+    {
+        if (!formContext.Validate()) return;
+        await ecb_Save.InvokeAsync(MovieVM);
+    }
+
+    IFileListEntry[] SelectedFiles;
+    public async Task AddNewMovie(IFileListEntry[] files)
+    {
+        SelectedFiles = files;
+
+
+        if (SelectedFiles != null)
+        {
+            MovieVM.Movie.Name = SelectedFiles[0].Name;
+            using (var reader = new System.IO.StreamReader(SelectedFiles[0].Data))
+            {
+                MovieVM.Movie.Text = await reader.ReadToEndAsync();
+            }
+        }
+    }
+
+}
+
+<style>
+    .lbl {
+        font-size: 14px;
+        color: gray;
+        width: 100%;
+        text-align: right;
+        background-color: whitesmoke;
+    }
+</style>
+<style>
+    .e-input-picture::before {
+        content: '\e335';
+        font-family: e-icons;
+    }
+
+    .e-input-calendar::before {
+        content: '\e901';
+        font-family: e-icons;
+        font-size: 13px;
+    }
+
+    .content-wrapper {
+        width: 90%;
+        margin: 0 auto;
+        min-width: 85px;
+    }
+
+        .content-wrapper div.row {
+            padding: 15px 0px;
+        }
+
+    .custom-padding-05 {
+        padding-top: 5px;
+    }
+
+    @@media only screen and (max-width: 480px) {
+        .content-wrapper {
+            width: 92%;
+        }
+
+        .col-xs-6,
+        .col-xs-4,
+        .col-xs-12 {
+            padding: 10px 5px;
+            width: 100%;
+        }
+
+        .content-wrapper div.row {
+            padding: 0px;
+        }
+    }
+
+    #description td {
+        vertical-align: top;
+    }
+
+    .e-outline.e-float-input,
+    .e-outline.e-float-input.e-control-wrapper {
+        margin-top: 0;
+    }
+
+    .fabric .row.material2,
+    .bootstrap .row.material2,
+    .bootstrap4 .row.material2,
+    .highcontrast .row.material2 {
+        display: none;
+    }
+
+    .e-upload-picture::before {
+        content: '\e335';
+        font-family: e-icons;
+    }
+
+    .bootstrap4 .e-upload-picture::before {
+        content: '\e769';
+        font-family: e-icons;
+    }
+</style>

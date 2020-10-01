@@ -1,0 +1,79 @@
+﻿@inherits LayoutComponentBase
+
+
+
+    <CascadingValue Value="@appParam">
+
+
+
+        <div class="main">
+            <div class="content">
+                @Body
+            </div>
+        </div>
+    </CascadingValue>
+
+
+@code
+{
+    [Inject] public IUserVocService UserVocService { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] public IMyService MyService { get; set; }
+
+    public AppParam appParam { get; set; } = new AppParam();
+    public int MyProperty { get; set; }
+
+
+
+    public class AppParam
+    {
+        //public string APIUrl { get; set; } = "http://ahmed154-001-site4.etempurl.com";
+        public string APIUrl { get; set; } = "https://localhost:44305";
+
+        public string UserName { get; set; }
+        public List<UserVocVM> StudyUserVocVMs { get; set; } = new List<UserVocVM>();
+        public List<UserVocVM> CheckUserVocVMs { get; set; } = new List<UserVocVM>();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        //appParam.UserName = await JSRuntime.GetFromLocalStorage("Email");
+
+        //if (!string.IsNullOrEmpty(appParam.UserName))
+        //{
+        //    await GetStudyUserVocVms();
+        //    await GetCheckUserVocVms();
+        //}
+
+        //MyService.RefreshRequested += RefreshMe;
+        //MyService.RefreshUserVocChech += RefreshGetCheckUserVocVms;
+
+    }
+
+
+
+    private void RefreshMe()
+    {
+        StateHasChanged();
+    }
+    private void RefreshGetCheckUserVocVms()
+    {
+        GetCheckUserVocVms();
+    }
+
+    public async Task GetStudyUserVocVms()
+    {
+        appParam.StudyUserVocVMs = await UserVocService.GetVocStudy(new UserVocVM { UserName = appParam.UserName });
+        if (appParam.StudyUserVocVMs.Count > 0 && !string.IsNullOrEmpty(appParam.StudyUserVocVMs[0].Exception))
+        {
+            await JSRuntime.Notfication(appParam.StudyUserVocVMs[0].Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+    public async Task GetCheckUserVocVms()
+    {
+        appParam.CheckUserVocVMs = await UserVocService.GetVocCheck(new UserVocVM { UserName = appParam.UserName });
+        if (appParam.CheckUserVocVMs.Count > 0 && !string.IsNullOrEmpty(appParam.CheckUserVocVMs[0].Exception))
+        {
+            await JSRuntime.Notfication(appParam.CheckUserVocVMs[0].Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+}

@@ -1,0 +1,103 @@
+﻿@page "/VocManager"
+
+<h3>VocManager</h3>
+<hr />
+
+<EditForm Model="xVocs">
+    <InputText @bind-Value="voc5000"></InputText>
+    <button @onclick=@Execute>Execute</button>
+</EditForm>
+
+<br />
+<span><b style="color:indianred"></b>@VPN</span>
+<br />
+<br />
+<span><b style="color:indianred"></b>@xVocs.Count</span>
+<br />
+
+
+@foreach (var xVoc in xVocs)
+{
+    <span>UPDATE [dbo].[Vocs] SET [Freq] = @xVoc.Freq  WHERE [Text] = '@xVoc.Text';</span>
+    <br />
+}
+
+@code {
+    class xVoc
+    {
+        public string Text { get; set; }
+        public int Freq { get; set; }
+    }
+    List<xVoc> xVocs = new List<xVoc>();
+
+    string VPN = "";
+    string voc5000 = "";
+
+
+    string pageContent;
+
+    string updateStatment = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    async Task CalcVocs(int i)
+    {
+        string txt = voc5000.Split(' ')[i];
+
+        using (WebClient client = new WebClient())
+        {
+            //client.Proxy = new WebProxy("36.67.66.202:47275");
+            try
+            {
+                pageContent = client.DownloadString($"https://youglish.com/pronounce/{txt}/english");
+
+                string key = "<span id='ttl_total'>";
+                string endKey = "<";
+
+                if (pageContent != null && pageContent.Contains(key))
+                {
+                    string Text = "";
+
+                    int StartIndex = pageContent.IndexOf(key) + key.Length;
+                    Text = pageContent.Substring(StartIndex);
+
+                    int EndIndex = Text.IndexOf(endKey);
+
+                    Text = Text.Substring(0, EndIndex);
+
+                    xVocs.Add(new xVoc { Text = txt, Freq = Convert.ToInt32(Text) });
+                }
+                else
+                {
+                    VPN = "YOU HAVE TO CHANGE YOUR VPN SERVER";
+                }
+            }
+            catch (WebException wex)
+            {
+                if (((HttpWebResponse)wex.Response).StatusCode == HttpStatusCode.NotFound)
+                {
+                    xVocs.Add(new xVoc { Text = txt, Freq = -1 });
+                }
+            }
+        }
+    }
+    async Task Execute()
+    {
+        VPN = string.Empty;
+        for (int i = 0; i < voc5000.Split(' ').Length; i++)
+        {
+            await CalcVocs(i);
+            if (string.IsNullOrEmpty(VPN)) await Task.Delay(2000);
+        }
+
+        //xVocs = xVocs.OrderByDescending(x => x.Freq).ToList();
+
+        foreach (var xVoc in xVocs)
+        {
+            updateStatment += Environment.NewLine + $"UPDATE [dbo].[Vocs] SET [Freq] = {xVoc.Freq}  WHERE [Text] = '{xVoc.Text}';";
+        }
+    }
+}

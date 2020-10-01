@@ -1,0 +1,481 @@
+<div class="container">
+    <div class="row">
+        <h4 style="margin:auto; width:100%; margin-left:45%"><b>@VocCardVM.Voc.Text</b></h4>
+    </div>
+
+    <div class="row mt-1">
+        <audio id="audio" src=@VocCardVM.VocAudios[0].Uri autoplay></audio>
+        <button @onclick=@PlaySound class="btn" style="margin-left:40%"><i class="fas fa-volume-up"></i></button>
+        <span style="margin-top:7px;">@VocCardVM.VocAudios[0].Phon</span>
+    </div>
+</div>
+
+
+<div class="container mt-5">
+    <h3>Difinitions and Examples</h3>
+    <table>
+        @foreach (var dif in VocCardVM.Definitions)
+        {
+            <tr style="color:navy;font-weight: bold;">@dif.Text</tr>
+
+            @foreach (var example in dif.Examples)
+            {
+                <tr style="font-size:12px;">
+                    @example.Text
+                </tr>
+            }
+        }
+    </table>
+    <hr />
+</div>
+<div class="container">
+    <h3>Synonyms</h3>
+    @foreach (var syn in VocCardVM.Synonyms)
+    {
+        @syn.Text <br />
+    }
+    <hr />
+</div>
+<div class="container">
+    <h3>Translation</h3>
+    @foreach (var tran in VocCardVM.Translates)
+    {
+        @tran.Text <br />
+    }
+    <hr />
+</div>
+
+
+@code
+{
+    //[Parameter] public Voc Voc { get; set; }
+    [Parameter] public VocCardVM VocCardVM { get; set; }
+    [Parameter]public PickNewVM PickNewVM { get; set; }
+
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] public IUserVocService UserVocService { get; set; }
+
+    public List<GetHtmlHelper> GetHtmlHelper { get; set; } = new List<GetHtmlHelper>();
+
+    public List<string> stringList { get; set; } = new List<string>();
+    public List<Dif> Difs { get; set; } = new List<Dif>();
+    public List<string> Synonyms { get; set; } = new List<string>();
+    public List<string> Translation { get; set; } = new List<string>();
+    public string phon { get; set; }
+
+    List<Definition> definitions = new List<Definition>();
+
+
+
+    bool hidden = true;
+
+    public class Dic
+    {
+        public string DicName { get; set; }
+        public string URL { get; set; }
+        public string Element { get; set; }
+    }
+    public class Meaning
+    {
+        public string Dic { get; set; }
+        public string Word { get; set; }
+        public int Rank { get; set; } = 1;
+        public string URL { get; set; }
+        public string AudioFileUrl { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //VocCardVM = VocCardVM;
+    }
+
+    #region Pro
+    public async Task RefreshVocCard(VocCardVM vocCardVM)
+    {
+        VocCardVM = null;
+        VocCardVM = vocCardVM;
+        //StateHasChanged();
+    }
+    async Task FillGetHtmlHelper()
+    {
+        GetHtmlHelper.Clear();
+        GetHtmlHelper.Add(new GetHtmlHelper()
+        {
+            Id = 0,
+            VocText = VocCardVM.Voc.Text,
+            Uri = "https://www.oxfordlearnersdictionaries.com/definition/english/",
+            Key = "sound audio_play_button pron-us icon-audio\" data-src-mp3=\"",
+            KeyEnd = "data-src-ogg",
+            SmallKey = "class=\"phon\">",
+            SmallKeyEnd = "</span>",
+            SiteName = "Oxford",
+            Target = "Pronouciation"
+        });
+
+        GetHtmlHelper.Add(new GetHtmlHelper()
+        {
+            Id = 1,
+            VocText = VocCardVM.Voc.Text,
+            Uri = "https://dictionary.cambridge.org/dictionary/english/",
+            Key = "def ddef_d db\">",
+            KeyEnd = "</div>",
+            SmallKey = ">",
+            SmallKeyEnd = "<",
+            SiteName = "Cambridg",
+            Target = "Difinition"
+        });
+        GetHtmlHelper.Add(new GetHtmlHelper()
+        {
+            Id = 2,
+            VocText = VocCardVM.Voc.Text,
+            Uri = "https://dictionary.cambridge.org/dictionary/english/",
+            Key = "examp dexamp\">",
+            KeyEnd = "</span></div>",
+            SmallKey = ">",
+            SmallKeyEnd = "<",
+            SiteName = "Cambridg",
+            Target = "Examples"
+        });
+        GetHtmlHelper.Add(new GetHtmlHelper()
+        {
+            Id = 3,
+            VocText = VocCardVM.Voc.Text,
+            Uri = "https://www.thesaurus.com/browse/",
+            Key = "class=\"css-18rr30y etbu2a31\">",
+            KeyEnd = "</a>",
+            SiteName = "Thesurus",
+            Target = "Synonyms"
+        });
+        GetHtmlHelper.Add(new GetHtmlHelper()
+        {
+            Id = 4,
+            VocText = VocCardVM.Voc.Text,
+            Uri = "https://dictionary.cambridge.org/dictionary/english-arabic/",
+            Key = "<span class=\"trans dtrans dtrans-se \" lang=\"ar\">",
+            KeyEnd = "</span>",
+            SiteName = "Cambridg",
+            Target = "ArabicTranslation"
+        });
+    }
+    async Task GetAudioUri()
+    {
+        using (WebClient client = new WebClient())
+        {
+            GetHtmlHelper[0].PageContent = client.DownloadString($"{GetHtmlHelper[0].Uri}{GetHtmlHelper[0].VocText}");
+        }
+
+        if (GetHtmlHelper[0].PageContent.Contains(GetHtmlHelper[0].Key))
+        {
+            GetHtmlHelper[0].StartIndex = GetHtmlHelper[0].PageContent.IndexOf(GetHtmlHelper[0].Key) + GetHtmlHelper[0].Key.Length;
+            GetHtmlHelper[0].Text = GetHtmlHelper[0].PageContent.Substring(GetHtmlHelper[0].StartIndex);
+
+            GetHtmlHelper[0].EndIndex = GetHtmlHelper[0].Text.IndexOf(GetHtmlHelper[0].KeyEnd);
+            GetHtmlHelper[0].PageContent = GetHtmlHelper[0].Text;
+
+            GetHtmlHelper[0].Text = GetHtmlHelper[0].Text.Substring(0, GetHtmlHelper[0].EndIndex);
+            GetHtmlHelper[0].Text = GetHtmlHelper[0].Text.Replace("\"", "").Trim();
+        }
+        if (GetHtmlHelper[0].PageContent.Contains(GetHtmlHelper[0].SmallKey))
+        {
+            GetHtmlHelper[0].StartIndex = GetHtmlHelper[0].PageContent.IndexOf(GetHtmlHelper[0].SmallKey) + GetHtmlHelper[0].SmallKey.Length;
+            phon = GetHtmlHelper[0].PageContent.Substring(GetHtmlHelper[0].StartIndex);
+
+            GetHtmlHelper[0].EndIndex = phon.IndexOf(GetHtmlHelper[0].SmallKeyEnd);
+            phon = phon.Substring(0, GetHtmlHelper[0].EndIndex);
+        }
+    }
+    async Task<Dif> GetCambText(string pageContent, string bigKeyStart, string bigKeyEnd, string smallKeyStart, string smallKeyEnd)
+    {
+        int contentPageStart, contentPageEnd, start, end;
+        string txt = pageContent;
+
+        contentPageStart = pageContent.IndexOf(bigKeyStart) + bigKeyStart.Length;
+        contentPageEnd = (pageContent.Substring(contentPageStart).Contains(bigKeyEnd)) ? pageContent.Substring(contentPageStart).IndexOf(bigKeyEnd) : pageContent.Length - contentPageStart;
+
+        txt = txt.Substring(contentPageStart, contentPageEnd);
+
+        stringList.Clear();
+        if (txt.Contains(smallKeyEnd))
+        {
+            stringList.Add(txt.Substring(0, txt.IndexOf(smallKeyEnd)));
+            txt = txt.Substring(txt.IndexOf(smallKeyEnd));
+        }
+        else
+        {
+
+        }
+
+
+        while (txt.Contains(smallKeyStart))
+        {
+            start = txt.IndexOf(smallKeyStart) + smallKeyStart.Length;
+            end = (txt.Substring(start).Contains(smallKeyEnd)) ? txt.Substring(start).IndexOf(smallKeyEnd) : txt.Length - start;
+
+            stringList.Add(txt.Substring(start, end));
+
+            txt = txt.Substring(start + end);
+        }
+
+        txt = "";
+        foreach (var item in stringList)
+        {
+            txt += item + " ";
+        }
+
+        pageContent = pageContent.Substring(contentPageStart + contentPageEnd);
+        return new Dif { Text = txt, PageContent = pageContent };
+
+    }
+    async Task GetSynonyms()
+    {
+        using (WebClient client = new WebClient())
+        {
+            GetHtmlHelper[3].PageContent = client.DownloadString($"{GetHtmlHelper[3].Uri}{GetHtmlHelper[3].VocText}");
+        }
+
+        Synonyms.Clear();
+        while (GetHtmlHelper[3].PageContent.Contains(GetHtmlHelper[3].Key))
+        {
+            GetHtmlHelper[3].Text = "";
+
+            GetHtmlHelper[3].StartIndex = GetHtmlHelper[3].PageContent.IndexOf(GetHtmlHelper[3].Key) + GetHtmlHelper[3].Key.Length;
+            GetHtmlHelper[3].Text = GetHtmlHelper[3].PageContent.Substring(GetHtmlHelper[3].StartIndex);
+
+            GetHtmlHelper[3].EndIndex = GetHtmlHelper[3].Text.IndexOf(GetHtmlHelper[3].KeyEnd);
+
+            GetHtmlHelper[3].PageContent = GetHtmlHelper[3].Text;
+
+            GetHtmlHelper[3].Text = GetHtmlHelper[3].Text.Substring(0, GetHtmlHelper[3].EndIndex);
+
+            Synonyms.Add(GetHtmlHelper[3].Text.Trim());
+        }
+    }
+    async Task GetTranslation()
+    {
+        using (WebClient client = new WebClient())
+        {
+            GetHtmlHelper[4].PageContent = client.DownloadString($"{GetHtmlHelper[4].Uri}{GetHtmlHelper[4].VocText}");
+        }
+
+        Translation.Clear();
+        while (GetHtmlHelper[4].PageContent.Contains(GetHtmlHelper[4].Key))
+        {
+            GetHtmlHelper[4].Text = "";
+
+            GetHtmlHelper[4].StartIndex = GetHtmlHelper[4].PageContent.IndexOf(GetHtmlHelper[4].Key) + GetHtmlHelper[4].Key.Length;
+            GetHtmlHelper[4].Text = GetHtmlHelper[4].PageContent.Substring(GetHtmlHelper[4].StartIndex);
+
+            GetHtmlHelper[4].EndIndex = GetHtmlHelper[4].Text.IndexOf(GetHtmlHelper[4].KeyEnd);
+
+            GetHtmlHelper[4].PageContent = GetHtmlHelper[4].Text;
+
+            GetHtmlHelper[4].Text = GetHtmlHelper[4].Text.Substring(0, GetHtmlHelper[4].EndIndex);
+
+            Translation.Add(GetHtmlHelper[4].Text.Trim());
+        }
+    }
+    string RemoveTashkeel(string str)
+    {
+        str = str.Replace("\u064b", "");
+        str = str.Replace("\u064f", "");
+        str = str.Replace("\u064c", "");
+        str = str.Replace("\u0652", "");
+        str = str.Replace("\u064d", "");
+        str = str.Replace("\u0650", "");
+        str = str.Replace("\u0651", "");
+        str = str.Replace("\u064e", "");
+
+        return str;
+    }
+    string Reformat(string txt)
+    {
+        txt = txt.Replace("<font face=\"comic sans ms\">", "");
+        txt = txt.Replace("</font>", "");
+        txt = txt.Replace("<i>", "");
+        txt = txt.Replace("</i>", "");
+        txt = txt.Replace("- ", " ");
+        txt = txt.Replace("?", "");
+        txt = txt.Replace("!", "");
+        txt = txt.Replace(", ", " ");
+        txt = txt.Replace(".", "");
+        txt = txt.Replace("<i>", "");
+        txt = txt.Replace("</i>", "");
+
+        return txt;
+    }
+    async Task GetFromCambridgeDic(string word)
+    {
+        //var webGet = new HtmlWeb();
+        //var doc = new HtmlDocument();
+        string strPage;
+        List<Dic> DicsList = new List<Dic>();
+
+        List<Meaning> DicMeanList = new List<Meaning>();
+
+        int StartIndex, EndIndex = 0;
+        string txt;
+        bool Exsist = false;
+
+        DicsList.Add(new Dic { DicName = "Cambridge", URL = "https://dictionary.cambridge.org/dictionary/english-arabic/", Element = "<span class=\"trans dtrans dtrans-se \" lang=\"ar\">" });
+        //DicsList.Add(new Dic { DicName = "Reverso", URL = "https://dictionary.reverso.net/english-arabic/", Element = "<span id=\"translationName\">" });
+        DicsList.Add(new Dic { DicName = "Glosbe", URL = "https://en.glosbe.com/en/ar/", Element = "<strong class=\"nobold phr\">" });
+        DicsList.Add(new Dic { DicName = "dict", URL = "https://www.dict.com/arabic-english/", Element = "<span class='lex_ful_rr'>" });
+        //DicsList.Add(new Dic { DicName = "bab.la", URL = "https://en.bab.la/dictionary/english-arabic/", Element = "href='/dictionary/arabic-english/" });
+
+
+
+        foreach (var item in DicsList)
+        {
+            item.URL = item.URL + word;
+            using (WebClient client = new WebClient())
+            {
+                strPage = client.DownloadString(item.URL);
+            }
+
+            while (strPage.Contains(item.Element))
+            {
+                StartIndex = strPage.IndexOf(item.Element);
+                strPage = strPage.Substring(StartIndex + item.Element.Length).Trim();
+
+                if (item.DicName == "bab.la")
+                {
+                    EndIndex = strPage.IndexOf("'");
+                }
+                else
+                {
+                    EndIndex = strPage.IndexOf("<");
+                }
+
+                txt = strPage.Substring(0, EndIndex);
+                txt = RemoveTashkeel(txt).Trim();
+
+
+                Exsist = false;
+                foreach (var obj in DicMeanList)
+                {
+                    if (obj.Word == txt && obj.Dic == item.DicName)
+                    {
+                        Exsist = true;
+                    }
+                }
+
+                if (Exsist == false && txt != "")
+                {
+                    DicMeanList.Add(new Meaning { Dic = item.DicName, Word = txt, URL = item.URL });
+                }
+            }
+        }
+
+        int x = 0;
+        for (int i = 0; i < DicMeanList.Count; i++)
+        {
+            for (x = i + 1; x < DicMeanList.Count; x++)
+            {
+                if (DicMeanList[i].Word == DicMeanList[x].Word)
+                {
+                    DicMeanList[i].Rank++;
+                }
+            }
+        }
+
+        DicMeanList = DicMeanList.OrderByDescending(r => r.Rank).ToList();
+
+        Translation.Clear();
+        foreach (var dic in DicMeanList)
+        {
+            if(!Translation.Contains(dic.Word)) Translation.Add(dic.Word);
+        }
+    }
+    async Task FillDataBaseVocCard()
+    {
+        VocCardVM vocCardVM = new VocCardVM();
+
+        List<Synonym> synonyms = new List<Synonym>();
+        List<Translate> translates = new List<Translate>();
+
+        foreach (var voc in PickNewVM.Vocs)
+        {
+            VocCardVM.Voc = voc;
+            await CamDifHandlerForDatabase();
+
+            foreach (var syn in Synonyms)
+            {
+                synonyms.Add(new Synonym { Text = syn, VocId = VocCardVM.Voc.Id });
+            }
+            foreach (var tran in Translation)
+            {
+                translates.Add(new Translate { Text = tran, VocId = VocCardVM.Voc.Id });
+            }
+
+            vocCardVM.Voc = VocCardVM.Voc;
+            vocCardVM.VocAudios = new List<VocAudio> { new VocAudio { Uri = GetHtmlHelper[0].Text, Phon = phon, VocId = VocCardVM.Voc.Id } };
+            vocCardVM.Definitions = definitions;
+            vocCardVM.Synonyms = synonyms;
+            vocCardVM.Translates = translates;
+
+            await UserVocService.AddVocCardVM(vocCardVM);
+        }
+    }
+    async Task CamDifHandlerForDatabase()
+    {
+        await FillGetHtmlHelper();
+        await GetAudioUri();
+        await GetSynonyms();
+        //await GetTranslation();
+        await GetFromCambridgeDic(VocCardVM.Voc.Text);
+
+        //int contentPageStart, contentPageEnd, start, end;
+        string pageContent, txt;
+        using (WebClient client = new WebClient()) pageContent = client.DownloadString($"{GetHtmlHelper[1].Uri}{GetHtmlHelper[1].VocText}");
+
+        txt = pageContent;
+        Difs.Clear();
+        definitions.Clear();
+        while (pageContent.Contains(GetHtmlHelper[1].Key))
+        {
+            Dif dif = new Dif();
+            var x = await GetCambText(pageContent, GetHtmlHelper[1].Key, GetHtmlHelper[1].KeyEnd, GetHtmlHelper[1].SmallKey, GetHtmlHelper[1].SmallKeyEnd);
+            dif.Text = x.Text;
+
+            //if(string.IsNullOrEmpty(dif.Text)) definitions.Add(new Definition { Text = dif.Text, VocId = Voc.Id});
+
+            pageContent = x.PageContent;
+
+            while (pageContent.Contains(GetHtmlHelper[2].Key) && pageContent.IndexOf(GetHtmlHelper[2].Key) < pageContent.IndexOf(GetHtmlHelper[1].Key))
+            {
+                var y = await GetCambText(pageContent, GetHtmlHelper[2].Key, GetHtmlHelper[2].KeyEnd, GetHtmlHelper[2].SmallKey, GetHtmlHelper[2].SmallKeyEnd);
+                dif.Examples.Add(y.Text);
+
+                //if (definitions.Count > 0) definitions[definitions.Count - 1].Examples.Add(new Example { Text = y.Text, VocId = Voc.Id});
+
+                pageContent = y.PageContent;
+            }
+            Difs.Add(dif);
+            if (!string.IsNullOrEmpty(dif.Text))
+            {
+                List<Example> examples = new List<Example>();
+                foreach (var ex in dif.Examples)
+                {
+                    examples.Add(new Example { Text = ex.Trim(), VocId = VocCardVM.Voc.Id });
+                }
+                definitions.Add(new Definition { Text = dif.Text.Trim(), Examples = examples, VocId = VocCardVM.Voc.Id });
+            }
+        }
+
+    }
+    #endregion
+
+    async Task PlaySound()
+    {
+        await JSRuntime.InvokeVoidAsync("playSound");
+    }
+
+}
+
+<style>
+    .center {
+        margin: auto;
+        width: 100%;
+        margin-left: 45%;
+    }
+</style>

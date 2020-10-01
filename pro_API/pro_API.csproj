@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\**" />
+    <Content Remove="Models\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <None Remove="Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20200723002939_RenameTable-Employee.cs" />
+    <Compile Remove="Migrations\20200723002939_RenameTable-Employee.Designer.cs" />
+    <Compile Remove="Migrations\20200725223452_IO-Update.cs" />
+    <Compile Remove="Migrations\20200725223452_IO-Update.Designer.cs" />
+    <Compile Remove="Migrations\20200725223640_IO-Update.cs" />
+    <Compile Remove="Migrations\20200725223640_IO-Update.Designer.cs" />
+    <Compile Remove="Migrations\20200725223738_IO-Update.cs" />
+    <Compile Remove="Migrations\20200725223738_IO-Update.Designer.cs" />
+    <Compile Remove="Migrations\20200822070802_Voc.cs" />
+    <Compile Remove="Migrations\20200822070802_Voc.Designer.cs" />
+    <Compile Remove="Migrations\20200823132553_uservoc-Pkey.cs" />
+    <Compile Remove="Migrations\20200823132553_uservoc-Pkey.Designer.cs" />
+    <Compile Remove="Migrations\20200901205533_VocAudio.cs" />
+    <Compile Remove="Migrations\20200901205533_VocAudio.Designer.cs" />
+    <Compile Remove="Migrations\20200901211548_VocAudio-Did-Ex.cs" />
+    <Compile Remove="Migrations\20200901211548_VocAudio-Did-Ex.Designer.cs" />
+    <Compile Remove="Migrations\20200902140324_edit-dif.cs" />
+    <Compile Remove="Migrations\20200902140324_edit-dif.Designer.cs" />
+    <Compile Remove="Migrations\20200925224843_VocSubtitle.cs" />
+    <Compile Remove="Migrations\20200925224843_VocSubtitle.Designer.cs" />
+    <Compile Remove="Migrations\20200926175208_Add-VocsSubtitless.cs" />
+    <Compile Remove="Migrations\20200926175208_Add-VocsSubtitless.Designer.cs" />
+    <Compile Remove="Migrations\20200930160640_Influencer.cs" />
+    <Compile Remove="Migrations\20200930160640_Influencer.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\pro_Models\pro_Models.csproj" />
+  </ItemGroup>
+
+
+</Project>

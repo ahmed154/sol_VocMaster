@@ -1,0 +1,68 @@
+@page "/voc/study"
+@implements IDisposable
+
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;">Vocs Study</span>
+        </div>
+
+        @if (appParam.StudyUserVocVMs.Count > 0)
+        {
+            <div class="row pt-4">
+                <button @onclick=@Next class="btn rounded">Next</button>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+
+    @if (appParam.StudyUserVocVMs.Count == 0)
+    {
+        <div class="row pt-4">
+            <a href="picknew" class="btn rounded">Pick New Vocabulary</a>
+        </div>
+    }
+    else
+    {
+        <VocForm VocVM="UserVocVM.VocVM" Type="Details" />
+    }
+</div>
+
+
+
+@code {
+
+    [CascadingParameter] public MainLayout.AppParam appParam { get; set; }
+    [Parameter] public int id { get; set; }
+    [Inject] public IUserVocService UserVocService { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] public IMyService MyService { get; set; }
+
+    UserVocVM UserVocVM { get; set; } = new UserVocVM();
+    List<UserVocVM> UserVocVMsToUpdate { get; set; } = new List<UserVocVM>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (appParam.StudyUserVocVMs.Count > 0) UserVocVM = appParam.StudyUserVocVMs[0];
+    }
+    void IDisposable.Dispose()
+    {
+        //UserVocService.UpdateUserVocList(UserVocVMsToUpdate);
+    }
+
+    protected async Task Next()
+    {
+        appParam.StudyUserVocVMs[0].UserVoc.Study = true;
+        UserVocVMsToUpdate.Add(appParam.StudyUserVocVMs[0]);
+
+        appParam.StudyUserVocVMs.RemoveAt(0);
+        if (appParam.StudyUserVocVMs.Count > 0) UserVocVM = appParam.StudyUserVocVMs[0];
+
+        MyService.CallRequestRefresh();
+    }
+}

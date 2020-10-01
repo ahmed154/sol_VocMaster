@@ -1,0 +1,48 @@
+@page "/voc/new"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/voc" style="color:#6372C4">Vocs</a> /  New</span>
+        </div>
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/voc"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <VocForm VocVM="VocVM" ecb_Save="Create" Type="New" @ref="Form" />
+</div>
+
+
+@code
+{
+    [Inject] public IVocService VocService { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    protected VocForm Form;
+    VocVM VocVM { get; set; } = new VocVM();
+
+    private async Task Save()
+    {
+        await Form.ParentSubmit();
+    }
+    private async Task Create()
+    {
+        VocVM.Exception = null;
+        VocVM createdVocVM = await VocService.CreateVoc(VocVM);
+
+        if (string.IsNullOrEmpty(createdVocVM.Exception))
+        {
+            await JSRuntime.Notfication($"Voc {VocVM.Voc.Text} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+            NavigationManager.NavigateTo($"/voc/{createdVocVM.Voc.Id}");
+        }
+        else
+        {
+            await JSRuntime.Notfication(createdVocVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+}

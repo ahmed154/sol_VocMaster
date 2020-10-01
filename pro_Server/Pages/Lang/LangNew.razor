@@ -1,0 +1,48 @@
+@page "/lang/new"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/lang" style="color:#6372C4">Langs</a> /  New</span>
+        </div>
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/lang"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <LangForm LangVM="LangVM" ecb_Save="Create" Type="New" @ref="Form" />
+</div>
+
+
+@code
+{
+    [Inject] public ILangService LangService { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    protected LangForm Form;
+    LangVM LangVM { get; set; } = new LangVM();
+
+    private async Task Save()
+    {
+        await Form.ParentSubmit();
+    }
+    private async Task Create()
+    {
+        LangVM.Exception = null;
+        LangVM createdLangVM = await LangService.CreateLang(LangVM);
+
+        if (string.IsNullOrEmpty(createdLangVM.Exception))
+        {
+            await JSRuntime.Notfication($"Lang {LangVM.Lang.Name} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+            NavigationManager.NavigateTo($"/lang/{createdLangVM.Lang.Id}");
+        }
+        else
+        {
+            await JSRuntime.Notfication(createdLangVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+}

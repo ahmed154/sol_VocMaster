@@ -1,0 +1,70 @@
+@page "/idiom"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;">Idioms</span>
+        </div>
+        <div class="row pt-4">
+            <a class="btn btn-primary" href="/idiom/new" style="background-color:#6372C4"><i class="far fa-file"></i> New</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    @if (IdiomVMs == null)
+    {
+        <p style="color:gray;">Loading ...</p>
+    }
+    else if (IdiomVMs.Count() == 0)
+    {
+        <p style="color:gray;">No records to display.</p>
+    }
+    else
+    {
+        <SfGrid DataSource="@IdiomVMs" AllowPaging="true" AllowSorting="true">
+            <GridEvents RowSelected="RowSelectHandler" TValue="IdiomVM"></GridEvents>
+            <GridPageSettings PageSize="10" />
+            <GridColumns>
+                <GridColumn Field="Idiom.Id" HeaderText="ID" Width="50" />
+                <GridColumn Field="Idiom.Name" HeaderText="Name" Width="200" />
+            </GridColumns>
+        </SfGrid>
+    }
+</div>
+
+
+@code 
+{
+    [Inject] public IIdiomService IdiomService { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+
+    public List<IdiomVM> IdiomVMs { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IdiomVMs =(await IdiomService.GetIdioms()).OrderByDescending(x => x.Idiom.Id).ToList();
+        if (IdiomVMs.Count > 0 && !string.IsNullOrEmpty(IdiomVMs[0].Exception))
+        {
+            await JSRuntime.Notfication(IdiomVMs[0].Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+
+    public void RowSelectHandler(RowSelectEventArgs<IdiomVM> args)
+    {
+        NavigationManager.NavigateTo($"idiom/{args.Data.Idiom.Id}");
+    }
+}
+
+
+ <style>
+            .e-grid .e-headercelldiv {
+                background-color: #F2F3F4;
+                font-size: 16px;
+            }
+
+            .e-grid .e-rowcell {
+                font-size: 14px;
+            }
+ </style>

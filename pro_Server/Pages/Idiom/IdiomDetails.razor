@@ -1,0 +1,54 @@
+@page "/idiom/{id:int}"
+
+    <div class="container bg-white rounded border p-3">
+        <div class="pl-3">
+            <div class="row">
+                <span style="font-size:18px; color:#8f8f8f;"><a href="/idiom" style="color:#6372C4">Idioms</a> /  @id</span>
+            </div>
+            <div class="row pt-4">
+                <a class="btn btn-primary" href="/idiom/edit/@id" style="background-color:#6372C4"><i class="far fa-edit"></i> Edit</a>
+                <a class="btn border ml-1" href="/idiom/new"><i class="far fa-file"></i> New</a>
+                <button class="btn border ml-5" @onclick="DeleteConfirm"><i class="far fa-trash-alt"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container bg-white border box-shadow p-3 rounded">
+        <IdiomForm IdiomVM="IdiomVM" Type="Details" />
+    </div>
+
+
+    @code {
+
+        [Parameter] public int id { get; set; }
+        [Inject] public IIdiomService IdiomService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+
+        IdiomVM IdiomVM { get; set; } = new IdiomVM();
+
+        protected override async Task OnInitializedAsync()
+        {
+            IdiomVM = await IdiomService.GetIdiom(id);
+        }
+
+        protected async Task DeleteConfirm()
+        {
+            bool result = await JSRuntime.Confirm("Confirmation", $"Are you sure you want to delete {IdiomVM.Idiom.Text} ?", IJSRuntimeExtensionMethods.SweetAlertMessageType.question);
+            if (result) await Delete();  
+        }
+        protected async Task Delete()
+        {
+            IdiomVM createdIdiomVM = await IdiomService.DeleteIdiom(IdiomVM.Idiom.Id);
+
+            if (string.IsNullOrEmpty(createdIdiomVM.Exception))
+            {
+                await JSRuntime.Notfication($"Idiomment {IdiomVM.Idiom.Text} has been deleted successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                NavigationManager.NavigateTo($"/idiom");
+            }
+            else
+            {
+                await JSRuntime.Notfication(createdIdiomVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+        }
+    }

@@ -1,0 +1,70 @@
+@page "/subtitle"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;">Subtitles</span>
+        </div>
+        <div class="row pt-4">
+            <a class="btn btn-primary" href="/subtitle/new" style="background-color:#6372C4"><i class="far fa-file"></i> New</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    @if (SubtitleVMs == null)
+    {
+        <p style="color:gray;">Loading ...</p>
+    }
+    else if (SubtitleVMs.Count() == 0)
+    {
+        <p style="color:gray;">No records to display.</p>
+    }
+    else
+    {
+        <SfGrid DataSource="@SubtitleVMs" AllowPaging="true" AllowSorting="true">
+            <GridEvents RowSelected="RowSelectHandler" TValue="SubtitleVM"></GridEvents>
+            <GridPageSettings PageSize="10" />
+            <GridColumns>
+                <GridColumn Field="Subtitle.Id" HeaderText="ID" Width="50" />
+                <GridColumn Field="Subtitle.Name" HeaderText="Name" Width="200" />
+            </GridColumns>
+        </SfGrid>
+    }
+</div>
+
+
+@code 
+{
+    [Inject] public ISubtitleService SubtitleService { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+
+    public List<SubtitleVM> SubtitleVMs { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        SubtitleVMs =(await SubtitleService.GetSubtitles()).OrderByDescending(x => x.Subtitle.Id).ToList();
+        if (SubtitleVMs.Count > 0 && !string.IsNullOrEmpty(SubtitleVMs[0].Exception))
+        {
+            await JSRuntime.Notfication(SubtitleVMs[0].Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+
+    public void RowSelectHandler(RowSelectEventArgs<SubtitleVM> args)
+    {
+        NavigationManager.NavigateTo($"subtitle/{args.Data.Subtitle.Id}");
+    }
+}
+
+
+ <style>
+            .e-grid .e-headercelldiv {
+                background-color: #F2F3F4;
+                font-size: 16px;
+            }
+
+            .e-grid .e-rowcell {
+                font-size: 14px;
+            }
+ </style>

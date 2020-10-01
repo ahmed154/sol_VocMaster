@@ -1,0 +1,48 @@
+@page "/quote/new"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/quote" style="color:#6372C4">Quotes</a> /  New</span>
+        </div>
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/quote"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <QuoteForm QuoteVM="QuoteVM" ecb_Save="Create" Type="New" @ref="Form" />
+</div>
+
+
+@code
+{
+    [Inject] public IQuoteService QuoteService { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    protected QuoteForm Form;
+    QuoteVM QuoteVM { get; set; } = new QuoteVM();
+
+    private async Task Save()
+    {
+        await Form.ParentSubmit();
+    }
+    private async Task Create()
+    {
+        QuoteVM.Exception = null;
+        QuoteVM createdQuoteVM = await QuoteService.CreateQuote(QuoteVM);
+
+        if (string.IsNullOrEmpty(createdQuoteVM.Exception))
+        {
+            await JSRuntime.Notfication($"Quote {QuoteVM.Quote.Text} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+            NavigationManager.NavigateTo($"/quote/{createdQuoteVM.Quote.Id}");
+        }
+        else
+        {
+            await JSRuntime.Notfication(createdQuoteVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+}

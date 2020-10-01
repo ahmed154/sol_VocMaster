@@ -1,0 +1,332 @@
+﻿@page "/VocControl"
+
+<h3>Voc Control</h3>
+
+<SfNumericTextBox @bind-Value=@VocId></SfNumericTextBox>
+<button @onclick=@GetControlVocCardVM>Get VocCardVM</button>
+
+
+    <div class="container bg-white border box-shadow p-3 rounded">
+
+                @if (VocCardVM.Count > 0)
+                {
+                    <div class="row float-right">
+                        <button @onclick=@StudyNexy class="btn rounded">Next</button>
+                    </div>
+                }
+
+                @if (VocCardVM.Count == 0)
+                {
+                    <div class="row pt-4">
+                        <span>Finish</span>
+                    </div> 
+                }
+                else
+                {
+                    <div class="row">
+                    </div>
+                    <div class="row mt-5">
+                        <div class="container ml-3">
+                            <div class="row ml-3">
+                                <h4 style="font-size:20px;"><b>#@VocCardVM[0].Voc.Id</b></h4>
+                            </div>
+                            <div class="row">
+                                <h4 style="font-size:40px;"><b>@VocCardVM[0].Voc.Text</b></h4>
+                            </div>
+
+                            <div class="row">
+                                @if (VocCardVM[0].VocAudios.Count > 0)
+                                {
+                                    <audio id="audio" src=@VocCardVM[0].VocAudios[0].Uri autoplay></audio>
+                                                        <button @onclick=@PlaySound class="btn" style="border:none;"><i class="fas fa-volume-up"></i></button>
+                                                                            <span style="margin-top:7px;">@VocCardVM[0].VocAudios[0].Phon</span>
+                                }
+
+                            </div>
+                        </div>
+
+                        <div class="container mt-5">
+                            <h3>Difinitions and Examples</h3>
+                            <table>
+                                @foreach (var dif in VocCardVM[0].Definitions)
+                                {
+                                    <tr style="color:navy; font-family:'Tajawal'; font-weight: bold; font-size: 20px;">@dif.Text</tr>
+
+                                    @foreach (var example in dif.Examples)
+                                    {
+                                        <tr style="font-family:'Tajawal'; font-size: 18px; ">
+                                            @example.Text
+                                        </tr>
+                                    }                    
+                                }
+                            </table><hr />         
+                        </div>
+
+                        <div class="container">
+                            <h3>Images</h3>
+                            <div class="row">
+                                <button @onclick=@(()=> bol_AddImage = !bol_AddImage) class="btn mr-5">Add Image</button>
+                                @if(bol_AddImage)
+                                {
+                                    <div class="row">
+                                        <a href=@($"https://pixabay.com/images/search/{VocCardVM[0].Voc.Text}") target="_blank" class="ml-2">pixabay</a>
+                                        <a href=@($"https://unsplash.com/s/photos/{VocCardVM[0].Voc.Text}") target="_blank" class="ml-2">unsplash</a>
+                                        <a href=@($"https://www.pexels.com/search/{VocCardVM[0].Voc.Text}") target="_blank" class="ml-2">pexels</a>
+                                        <a href=@($"https://www.freeimages.com/search/{VocCardVM[0].Voc.Text}") target="_blank" class="ml-2">freeimages</a>
+                                        <a href=@($"https://stocksnap.io/search/{VocCardVM[0].Voc.Text}") target="_blank" class="ml-2">stocksnap</a>
+                                        <a href=@($"https://gratisography.com/?s={VocCardVM[0].Voc.Text}") target="_blank" class="ml-2">gratisography</a>
+                                        <a href=@($"https://picjumbo.com/search/{VocCardVM[0].Voc.Text}") target="_blank" class="ml-2">picjumbo</a>
+                                    </div>
+
+                                    <div class="container bg-white border box-shadow p-3 rounded mt-2 mr-3">
+                                        <EditForm Model="ImageVM" Context="formContext">
+                                            <ObjectGraphDataAnnotationsValidator />
+
+                                            <div class="container border p-3">
+                                                <div class="row">
+                                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                                        <SfTextBox Placeholder="URI" @bind-Value="@ImageVM.Image.Uri"></SfTextBox>
+                                                        <ValidationMessage For="@(() => ImageVM.Image.Uri)" />
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-1">
+                                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                                        <SfTextBox Placeholder="Comment" @bind-Value="@ImageVM.Image.Comment"></SfTextBox>
+                                                        <ValidationMessage For="@(() => ImageVM.Image.Comment)" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row pt-4">
+                                                <button @onclick=@(() => SaveImage(formContext)) class="btn btn-primary ml-3" type="submit" style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+                                                <a @onclick=@(() => bol_AddImage = false) class="btn border ml-1"><i class="fas fa-undo"></i> Cancel</a>
+                                            </div>
+                                        </EditForm>
+                                    </div>
+                                }
+                                </div>
+                            <div class="row mt-3">
+                                @foreach (var image in VocCardVM[0].Images)
+                                {
+                                    <div class="row ml-1 mt-1">
+                                        <div class="col s12 m6">
+                                            <div class="card p-1">
+                                                <div class="card-image">
+                                                    <img src=@image.Uri>
+                                                </div>
+                                                <div class="card-content mt-2">
+                                                    <button @onclick=@(()=> VocCardVM[0].Images.Remove(image)) class="btn shadow-none float-right"><i class="far fa-trash-alt"></i></button>
+                                                    <p style="max-width:270px">@image.Comment</p>
+                                                </div>
+                                                <div class="card-action">
+                                                    @if(!image.Liked)
+                                                    {
+                                                        <button @onclick=@(()=>LikeImage(image)) class="btn shadow-none"><i class="far fa-thumbs-up"></i> @image.Like</button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button @onclick=@(()=>LikeImage(image)) class="btn shadow-none"><i class="fas fa-thumbs-up"></i> @image.Like</button>
+                                                    }
+                                                    @if(!image.Disliked)
+                                                    {
+                                                        <button @onclick=@(()=>DislikeImage(image)) class="btn shadow-none"><i class="far fa-thumbs-down"></i> @image.Dislike</button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button @onclick=@(()=>DislikeImage(image)) class="btn shadow-none"><i class="fas fa-thumbs-down"></i> @image.Dislike</button>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                 }
+                            </div><hr />
+                        </div>
+
+                        <div class="container">
+                            <h3>Videos</h3>
+                            <button @onclick=@CalcSubtitlesVM class="btn mr-5">Add Video</button>
+                            
+                            <div class="row ml-3">
+                                @if (Videos.Count > 0)
+                                {
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <td>
+                                                    Text
+                                                </td>
+                                                <td>
+                                                    Movie
+                                                </td>
+                                                <td>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var video in Videos)
+                                            {                                 
+                                                <tr>
+                                                    <td>
+                                                        @((MarkupString)video.Subtitle.Text)
+                                                    </td>
+                                                    <td>
+                                                        @((video.Subtitle.Movie.Name.Length >= 15)? video.Subtitle.Movie.Name.Substring(0, 15) : video.Subtitle.Movie.Name)
+                                                    </td>
+                                                    <td>
+                                                        <video width="320" controls>
+                                                          <source src=@($"https://VocMasterPullZone.b-cdn.net/Movies/Clips/{video.Subtitle.Index.PadLeft(4,'0')}.mp4") type="video/mp4">
+                                                         </video>                                                    
+                                                    </td>
+                                                </tr>                                      
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <span>No videos found</span>
+                                }
+                            </div>
+
+                            <div class="row ml-3">
+                                <a href=@($"https://youglish.com/pronounce/{VocCardVM[0].Voc.Text}/english?") target="_blank"><img height="75" width="150" src="data:image/png;base64,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"></a>
+                            </div><hr />
+                        </div>
+
+                        <div class="container">
+                            <h3>Synonyms</h3>
+                                @foreach (var syn in VocCardVM[0].Synonyms)
+                                {
+                                    <span style="font-family:'Tajawal'; background-color:#F2F4F4; padding:0px 3px 0px 3px;">@syn.Text</span> 
+                                }
+                            <hr />
+                        </div>
+
+                        <div class="container">
+                            <h3>Translation</h3>
+                                @foreach (var translate in VocCardVM[0].Translates)
+                                {
+                                    <span style="font-family:'Tajawal'; background-color:#F2F4F4; padding:0px 3px 0px 3px;">@translate.Text</span> 
+                                }
+                            <hr />
+                        </div>
+                    </div>
+                }
+            </div> 
+
+
+@code 
+{
+    [Inject] public IVocService VocService { get; set; }
+    [Inject] public ISubtitleService SubtitleService { get; set; }
+
+    [Inject] public IImageService ImageService { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+
+    public int VocId { get; set; }
+    public List<VocCardVM> VocCardVM { get; set; } = new List<VocCardVM>();
+    public List<Video> Videos { get; set; } = new List<Video>();
+
+    public bool bol_AddImage { get; set; }
+    public pro_Models.ViewModels.ImageVM ImageVM { get; set; } = new pro_Models.ViewModels.ImageVM();
+
+    async Task GetControlVocCardVM()
+    {
+        VocCardVM = await VocService.GetControlVocCardVMs(new VocCardVM { Voc = new Voc { Id = VocId} });
+    }
+    public async Task PlaySound()
+    {
+        await JSRuntime.InvokeVoidAsync("playSound");
+    }
+    protected async Task StudyNexy()
+    {
+        //VocCardVM[0].UserVoc.Study = true;
+        //VocMasterVMUpdate.Studys.Add(VocCardVM[0]);
+        //VocMasterVM.Results.FirstOrDefault(x => x.Voc.Id == VocCardVM[0].Voc.Id).Study = true;
+
+        //if (VocCardVM[0].UserVoc.Repetition == 0) VocMasterVM.Tests.Add(VocCardVM[0]);
+
+        VocCardVM.RemoveAt(0);
+        //if (VocCardVM.Count == 0)
+        //{
+        //    await UpdateVocMasterVM();
+        //}
+        //else
+        //{
+        //    //TimeLeft = new TimeSpan(); await Task.Delay(1200);
+        //    //Diffrence = VocCardVM[0].UserVoc.NextReviewTime - DateTime.UtcNow;
+        //    //TimeLeft = new TimeSpan(Diffrence.Days, Diffrence.Hours, Diffrence.Minutes, Diffrence.Seconds);
+        //    //Start();
+        //}
+    }
+    public async Task SaveImage(EditContext formContext)
+    {
+        if (!formContext.Validate()) return;
+        ImageVM.Exception = null;
+        ImageVM.Image.VocId = VocCardVM[0].Voc.Id;
+        ImageVM.Image.Voc = VocCardVM[0].Voc;
+        ImageVM createdImageVM = await ImageService.CreateImage(ImageVM);
+
+        if (string.IsNullOrEmpty(createdImageVM.Exception))
+        {
+            await JSRuntime.Notfication($"Image {ImageVM.Image.Comment} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+
+            VocCardVM[0].Images.Add(new pro_Models.Models.Image { Uri = ImageVM.Image.Uri, Comment = ImageVM.Image.Comment });
+            ImageVM = new ImageVM();
+        }
+        else
+        {
+            await JSRuntime.Notfication(createdImageVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+
+        bol_AddImage = false;
+    }
+    public async Task LikeImage(pro_Models.Models.Image image)
+    {
+        if (image.Liked)
+        {
+            image.Like--; image.Liked = false;
+        }
+        else
+        {
+            if (image.Disliked) image.Dislike--; image.Disliked = false;
+            image.Like++;
+            image.Liked = true;
+        }
+    }
+    public async Task DislikeImage(pro_Models.Models.Image image)
+    {
+        if (image.Disliked)
+        {
+            image.Dislike--; image.Disliked = false;
+        }
+        else
+        {
+            if (image.Liked) image.Like--; image.Liked = false;
+            image.Dislike++;
+            image.Disliked = true;
+        }
+    }
+
+    public async Task CalcSubtitlesVM()
+    {
+        Videos.Clear();
+        List<SubtitleVM> subtitleVMs = await SubtitleService.CalcSubtitlesVM(VocCardVM[0].Voc);
+
+        if (subtitleVMs.Count == 0) return;
+
+        if (string.IsNullOrEmpty(subtitleVMs[0].Exception))
+        {
+            foreach (var subtitleVM in subtitleVMs)
+            {
+                subtitleVM.Subtitle.Text = subtitleVM.Subtitle.Text.Replace(VocCardVM[0].Voc.Text, $"<mark>{VocCardVM[0].Voc.Text}</mark>");
+                Videos.Add(new Video { Subtitle = subtitleVM.Subtitle });              
+            }
+        }
+        else
+        {
+            await JSRuntime.Notfication(subtitleVMs[0].Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+}

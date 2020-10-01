@@ -1,0 +1,54 @@
+@page "/movie/{id:int}"
+
+    <div class="container bg-white rounded border p-3">
+        <div class="pl-3">
+            <div class="row">
+                <span style="font-size:18px; color:#8f8f8f;"><a href="/movie" style="color:#6372C4">Movies</a> /  @id</span>
+            </div>
+            <div class="row pt-4">
+                <a class="btn btn-primary" href="/movie/edit/@id" style="background-color:#6372C4"><i class="far fa-edit"></i> Edit</a>
+                <a class="btn border ml-1" href="/movie/new"><i class="far fa-file"></i> New</a>
+                <button class="btn border ml-5" @onclick="DeleteConfirm"><i class="far fa-trash-alt"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container bg-white border box-shadow p-3 rounded">
+        <MovieForm MovieVM="MovieVM" Type="Details" />
+    </div>
+
+
+    @code {
+
+        [Parameter] public int id { get; set; }
+        [Inject] public IMovieService MovieService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+
+        MovieVM MovieVM { get; set; } = new MovieVM();
+
+        protected override async Task OnInitializedAsync()
+        {
+            MovieVM = await MovieService.GetMovie(id);
+        }
+
+        protected async Task DeleteConfirm()
+        {
+            bool result = await JSRuntime.Confirm("Confirmation", $"Are you sure you want to delete {MovieVM.Movie.Name} ?", IJSRuntimeExtensionMethods.SweetAlertMessageType.question);
+            if (result) await Delete();  
+        }
+        protected async Task Delete()
+        {
+            MovieVM createdMovieVM = await MovieService.DeleteMovie(MovieVM.Movie.Id);
+
+            if (string.IsNullOrEmpty(createdMovieVM.Exception))
+            {
+                await JSRuntime.Notfication($"Moviement {MovieVM.Movie.Name} has been deleted successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                NavigationManager.NavigateTo($"/movie");
+            }
+            else
+            {
+                await JSRuntime.Notfication(createdMovieVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+        }
+    }

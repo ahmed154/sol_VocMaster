@@ -1,0 +1,54 @@
+@page "/subtitle/edit/{id:int}"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/subtitle" style="color:#6372C4">Subtitles</a>  /  @id</span>
+        </div>
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/subtitle/@id"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <SubtitleForm SubtitleVM="SubtitleVM" ecb_Save="Update" Type="Edit" @ref="Form"/>
+</div>
+
+    @code {
+
+        [Inject] public ISubtitleService SubtitleService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+        [Parameter] public int id { get; set; }
+
+        SubtitleVM SubtitleVM { get; set; } = new SubtitleVM();
+        protected SubtitleForm Form;
+
+        protected override async Task OnInitializedAsync()
+        {
+            SubtitleVM = await SubtitleService.GetSubtitle(id);
+        }
+
+        private async Task Save()
+        {
+            await Form.ParentSubmit();
+        }
+
+        private async Task Update()
+        {
+            SubtitleVM.Exception = null;
+            SubtitleVM updatedSubtitleVM = await SubtitleService.UpdateSubtitle(SubtitleVM.Subtitle.Id, SubtitleVM);
+
+            if (string.IsNullOrEmpty(updatedSubtitleVM.Exception))
+            {
+                await JSRuntime.Notfication($"Subtitlement {SubtitleVM.Subtitle.Text} has been updated successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                NavigationManager.NavigateTo($"/subtitle/{updatedSubtitleVM.Subtitle.Id}");
+            }
+            else
+            {
+                await JSRuntime.Notfication(updatedSubtitleVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+        }
+    }

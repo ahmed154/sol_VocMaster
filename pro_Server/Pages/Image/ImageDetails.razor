@@ -1,0 +1,54 @@
+@page "/image/{id:int}"
+
+    <div class="container bg-white rounded border p-3">
+        <div class="pl-3">
+            <div class="row">
+                <span style="font-size:18px; color:#8f8f8f;"><a href="/image" style="color:#6372C4">Images</a> /  @id</span>
+            </div>
+            <div class="row pt-4">
+                <a class="btn btn-primary" href="/image/edit/@id" style="background-color:#6372C4"><i class="far fa-edit"></i> Edit</a>
+                <a class="btn border ml-1" href="/image/new"><i class="far fa-file"></i> New</a>
+                <button class="btn border ml-5" @onclick="DeleteConfirm"><i class="far fa-trash-alt"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container bg-white border box-shadow p-3 rounded">
+        <ImageForm ImageVM="ImageVM" Type="Details" />
+    </div>
+
+
+    @code {
+
+        [Parameter] public int id { get; set; }
+        [Inject] public IImageService ImageService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+
+        ImageVM ImageVM { get; set; } = new ImageVM();
+
+        protected override async Task OnInitializedAsync()
+        {
+            ImageVM = await ImageService.GetImage(id);
+        }
+
+        protected async Task DeleteConfirm()
+        {
+            bool result = await JSRuntime.Confirm("Confirmation", $"Are you sure you want to delete {ImageVM.Image.Comment} ?", IJSRuntimeExtensionMethods.SweetAlertMessageType.question);
+            if (result) await Delete();  
+        }
+        protected async Task Delete()
+        {
+            ImageVM createdImageVM = await ImageService.DeleteImage(ImageVM.Image.Id);
+
+            if (string.IsNullOrEmpty(createdImageVM.Exception))
+            {
+                await JSRuntime.Notfication($"Imagement {ImageVM.Image.Comment} has been deleted successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                NavigationManager.NavigateTo($"/image");
+            }
+            else
+            {
+                await JSRuntime.Notfication(createdImageVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+        }
+    }

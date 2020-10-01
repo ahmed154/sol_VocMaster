@@ -1,0 +1,54 @@
+@page "/idiom/edit/{id:int}"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/idiom" style="color:#6372C4">Idioms</a>  /  @id</span>
+        </div>
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/idiom/@id"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <IdiomForm IdiomVM="IdiomVM" ecb_Save="Update" Type="Edit" @ref="Form"/>
+</div>
+
+    @code {
+
+        [Inject] public IIdiomService IdiomService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+        [Parameter] public int id { get; set; }
+
+        IdiomVM IdiomVM { get; set; } = new IdiomVM();
+        protected IdiomForm Form;
+
+        protected override async Task OnInitializedAsync()
+        {
+            IdiomVM = await IdiomService.GetIdiom(id);
+        }
+
+        private async Task Save()
+        {
+            await Form.ParentSubmit();
+        }
+
+        private async Task Update()
+        {
+            IdiomVM.Exception = null;
+            IdiomVM updatedIdiomVM = await IdiomService.UpdateIdiom(IdiomVM.Idiom.Id, IdiomVM);
+
+            if (string.IsNullOrEmpty(updatedIdiomVM.Exception))
+            {
+                await JSRuntime.Notfication($"Idiomment {IdiomVM.Idiom.Text} has been updated successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                NavigationManager.NavigateTo($"/idiom/{updatedIdiomVM.Idiom.Id}");
+            }
+            else
+            {
+                await JSRuntime.Notfication(updatedIdiomVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+        }
+    }

@@ -1,0 +1,54 @@
+@page "/quote/{id:int}"
+
+    <div class="container bg-white rounded border p-3">
+        <div class="pl-3">
+            <div class="row">
+                <span style="font-size:18px; color:#8f8f8f;"><a href="/quote" style="color:#6372C4">Quotes</a> /  @id</span>
+            </div>
+            <div class="row pt-4">
+                <a class="btn btn-primary" href="/quote/edit/@id" style="background-color:#6372C4"><i class="far fa-edit"></i> Edit</a>
+                <a class="btn border ml-1" href="/quote/new"><i class="far fa-file"></i> New</a>
+                <button class="btn border ml-5" @onclick="DeleteConfirm"><i class="far fa-trash-alt"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container bg-white border box-shadow p-3 rounded">
+        <QuoteForm QuoteVM="QuoteVM" Type="Details" />
+    </div>
+
+
+    @code {
+
+        [Parameter] public int id { get; set; }
+        [Inject] public IQuoteService QuoteService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+
+        QuoteVM QuoteVM { get; set; } = new QuoteVM();
+
+        protected override async Task OnInitializedAsync()
+        {
+            QuoteVM = await QuoteService.GetQuote(id);
+        }
+
+        protected async Task DeleteConfirm()
+        {
+            bool result = await JSRuntime.Confirm("Confirmation", $"Are you sure you want to delete {QuoteVM.Quote.Text} ?", IJSRuntimeExtensionMethods.SweetAlertMessageType.question);
+            if (result) await Delete();  
+        }
+        protected async Task Delete()
+        {
+            QuoteVM createdQuoteVM = await QuoteService.DeleteQuote(QuoteVM.Quote.Id);
+
+            if (string.IsNullOrEmpty(createdQuoteVM.Exception))
+            {
+                await JSRuntime.Notfication($"Quotement {QuoteVM.Quote.Text} has been deleted successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                NavigationManager.NavigateTo($"/quote");
+            }
+            else
+            {
+                await JSRuntime.Notfication(createdQuoteVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+        }
+    }

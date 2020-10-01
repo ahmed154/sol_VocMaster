@@ -1,0 +1,54 @@
+@page "/lang/{id:int}"
+
+    <div class="container bg-white rounded border p-3">
+        <div class="pl-3">
+            <div class="row">
+                <span style="font-size:18px; color:#8f8f8f;"><a href="/lang" style="color:#6372C4">Langs</a> /  @id</span>
+            </div>
+            <div class="row pt-4">
+                <a class="btn btn-primary" href="/lang/edit/@id" style="background-color:#6372C4"><i class="far fa-edit"></i> Edit</a>
+                <a class="btn border ml-1" href="/lang/new"><i class="far fa-file"></i> New</a>
+                <button class="btn border ml-5" @onclick="DeleteConfirm"><i class="far fa-trash-alt"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container bg-white border box-shadow p-3 rounded">
+        <LangForm LangVM="LangVM" Type="Details" />
+    </div>
+
+
+    @code {
+
+        [Parameter] public int id { get; set; }
+        [Inject] public ILangService LangService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+
+        LangVM LangVM { get; set; } = new LangVM();
+
+        protected override async Task OnInitializedAsync()
+        {
+            LangVM = await LangService.GetLang(id);
+        }
+
+        protected async Task DeleteConfirm()
+        {
+            bool result = await JSRuntime.Confirm("Confirmation", $"Are you sure you want to delete {LangVM.Lang.Name} ?", IJSRuntimeExtensionMethods.SweetAlertMessageType.question);
+            if (result) await Delete();  
+        }
+        protected async Task Delete()
+        {
+            LangVM createdLangVM = await LangService.DeleteLang(LangVM.Lang.Id);
+
+            if (string.IsNullOrEmpty(createdLangVM.Exception))
+            {
+                await JSRuntime.Notfication($"Langment {LangVM.Lang.Name} has been deleted successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                NavigationManager.NavigateTo($"/lang");
+            }
+            else
+            {
+                await JSRuntime.Notfication(createdLangVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+        }
+    }

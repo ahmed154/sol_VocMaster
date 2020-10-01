@@ -1,0 +1,48 @@
+@page "/subtitle/new"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/subtitle" style="color:#6372C4">Subtitles</a> /  New</span>
+        </div>
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/subtitle"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <SubtitleForm SubtitleVM="SubtitleVM" ecb_Save="Create" Type="New" @ref="Form" />
+</div>
+
+
+@code
+{
+    [Inject] public ISubtitleService SubtitleService { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    protected SubtitleForm Form;
+    SubtitleVM SubtitleVM { get; set; } = new SubtitleVM();
+
+    private async Task Save()
+    {
+        await Form.ParentSubmit();
+    }
+    private async Task Create()
+    {
+        SubtitleVM.Exception = null;
+        SubtitleVM createdSubtitleVM = await SubtitleService.CreateSubtitle(SubtitleVM);
+
+        if (string.IsNullOrEmpty(createdSubtitleVM.Exception))
+        {
+            await JSRuntime.Notfication($"Subtitle {SubtitleVM.Subtitle.Text} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+            NavigationManager.NavigateTo($"/subtitle/{createdSubtitleVM.Subtitle.Id}");
+        }
+        else
+        {
+            await JSRuntime.Notfication(createdSubtitleVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+}

@@ -1,0 +1,70 @@
+@page "/movie"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;">Movies</span>
+        </div>
+        <div class="row pt-4">
+            <a class="btn btn-primary" href="/movie/new" style="background-color:#6372C4"><i class="far fa-file"></i> New</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    @if (MovieVMs == null)
+    {
+        <p style="color:gray;">Loading ...</p>
+    }
+    else if (MovieVMs.Count() == 0)
+    {
+        <p style="color:gray;">No records to display.</p>
+    }
+    else
+    {
+        <SfGrid DataSource="@MovieVMs" AllowPaging="true" AllowSorting="true">
+            <GridEvents RowSelected="RowSelectHandler" TValue="MovieVM"></GridEvents>
+            <GridPageSettings PageSize="10" />
+            <GridColumns>
+                <GridColumn Field="Movie.Id" HeaderText="ID" Width="50" />
+                <GridColumn Field="Movie.Name" HeaderText="Name" Width="200" />
+            </GridColumns>
+        </SfGrid>
+    }
+</div>
+
+
+@code 
+{
+    [Inject] public IMovieService MovieService { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+
+    public List<MovieVM> MovieVMs { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        MovieVMs =(await MovieService.GetMovies()).OrderByDescending(x => x.Movie.Id).ToList();
+        if (MovieVMs.Count > 0 && !string.IsNullOrEmpty(MovieVMs[0].Exception))
+        {
+            await JSRuntime.Notfication(MovieVMs[0].Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+
+    public void RowSelectHandler(RowSelectEventArgs<MovieVM> args)
+    {
+        NavigationManager.NavigateTo($"movie/{args.Data.Movie.Id}");
+    }
+}
+
+
+ <style>
+            .e-grid .e-headercelldiv {
+                background-color: #F2F3F4;
+                font-size: 16px;
+            }
+
+            .e-grid .e-rowcell {
+                font-size: 14px;
+            }
+ </style>

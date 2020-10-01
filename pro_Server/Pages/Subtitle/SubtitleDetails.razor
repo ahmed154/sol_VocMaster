@@ -1,0 +1,54 @@
+@page "/subtitle/{id:int}"
+
+    <div class="container bg-white rounded border p-3">
+        <div class="pl-3">
+            <div class="row">
+                <span style="font-size:18px; color:#8f8f8f;"><a href="/subtitle" style="color:#6372C4">Subtitles</a> /  @id</span>
+            </div>
+            <div class="row pt-4">
+                <a class="btn btn-primary" href="/subtitle/edit/@id" style="background-color:#6372C4"><i class="far fa-edit"></i> Edit</a>
+                <a class="btn border ml-1" href="/subtitle/new"><i class="far fa-file"></i> New</a>
+                <button class="btn border ml-5" @onclick="DeleteConfirm"><i class="far fa-trash-alt"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container bg-white border box-shadow p-3 rounded">
+        <SubtitleForm SubtitleVM="SubtitleVM" Type="Details" />
+    </div>
+
+
+    @code {
+
+        [Parameter] public int id { get; set; }
+        [Inject] public ISubtitleService SubtitleService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+
+        SubtitleVM SubtitleVM { get; set; } = new SubtitleVM();
+
+        protected override async Task OnInitializedAsync()
+        {
+            SubtitleVM = await SubtitleService.GetSubtitle(id);
+        }
+
+        protected async Task DeleteConfirm()
+        {
+            bool result = await JSRuntime.Confirm("Confirmation", $"Are you sure you want to delete {SubtitleVM.Subtitle.Text} ?", IJSRuntimeExtensionMethods.SweetAlertMessageType.question);
+            if (result) await Delete();  
+        }
+        protected async Task Delete()
+        {
+            SubtitleVM createdSubtitleVM = await SubtitleService.DeleteSubtitle(SubtitleVM.Subtitle.Id);
+
+            if (string.IsNullOrEmpty(createdSubtitleVM.Exception))
+            {
+                await JSRuntime.Notfication($"Subtitlement {SubtitleVM.Subtitle.Text} has been deleted successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                NavigationManager.NavigateTo($"/subtitle");
+            }
+            else
+            {
+                await JSRuntime.Notfication(createdSubtitleVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+        }
+    }

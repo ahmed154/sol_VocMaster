@@ -1,0 +1,54 @@
+@page "/uservoc/{id:int}"
+
+    <div class="container bg-white rounded border p-3">
+        <div class="pl-3">
+            <div class="row">
+                <span style="font-size:18px; color:#8f8f8f;"><a href="/uservoc" style="color:#6372C4">UserVocs</a> /  @id</span>
+            </div>
+            <div class="row pt-4">
+                <a class="btn btn-primary" href="/uservoc/edit/@id" style="background-color:#6372C4"><i class="far fa-edit"></i> Edit</a>
+                <a class="btn border ml-1" href="/uservoc/new"><i class="far fa-file"></i> New</a>
+                <button class="btn border ml-5" @onclick="DeleteConfirm"><i class="far fa-trash-alt"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container bg-white border box-shadow p-3 rounded">
+        <UserVocForm UserVocVM="UserVocVM" Type="Details" />
+    </div>
+
+
+    @code {
+
+        [Parameter] public int id { get; set; }
+        [Inject] public IUserVocService UserVocService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+
+        UserVocVM UserVocVM { get; set; } = new UserVocVM();
+
+        protected override async Task OnInitializedAsync()
+        {
+            UserVocVM = await UserVocService.GetUserVoc(id);
+        }
+
+        protected async Task DeleteConfirm()
+        {
+            bool result = await JSRuntime.Confirm("Confirmation", $"Are you sure you want to delete {UserVocVM.UserVoc.Voc.Text} ?", IJSRuntimeExtensionMethods.SweetAlertMessageType.question);
+            if (result) await Delete();
+        }
+        protected async Task Delete()
+        {
+            //UserVocVM createdUserVocVM = await UserVocService.DeleteUserVoc(UserVocVM.UserVoc.Id);
+
+            //if (string.IsNullOrEmpty(createdUserVocVM.Exception))
+            //{
+            //    await JSRuntime.Notfication($"UserVocment {UserVocVM.UserVoc.Voc.Text} has been deleted successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+            //    NavigationManager.NavigateTo($"/uservoc");
+            //}
+            //else
+            //{
+            //    await JSRuntime.Notfication(createdUserVocVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            //}
+        }
+    }

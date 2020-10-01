@@ -1,0 +1,70 @@
+@page "/voc"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;">Vocs</span>
+        </div>
+        <div class="row pt-4">
+            <a class="btn btn-primary" href="/voc/new" style="background-color:#6372C4"><i class="far fa-file"></i> New</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    @if (VocVMs == null)
+    {
+        <p style="color:gray;">Loading ...</p>
+    }
+    else if (VocVMs.Count() == 0)
+    {
+        <p style="color:gray;">No records to display.</p>
+    }
+    else
+    {
+        <SfGrid DataSource="@VocVMs" AllowPaging="true" AllowSorting="true">
+            <GridEvents RowSelected="RowSelectHandler" TValue="VocVM"></GridEvents>
+            <GridPageSettings PageSize="10" />
+            <GridColumns>
+                <GridColumn Field="Voc.Id" HeaderText="ID" Width="50" />
+                <GridColumn Field="Voc.Text" HeaderText="Text" Width="200" />
+            </GridColumns>
+        </SfGrid>
+    }
+</div>
+
+
+@code 
+{
+    [Inject] public IVocService VocService { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+
+    public List<VocVM> VocVMs { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        VocVMs =await VocService.GetVocs();
+        if (VocVMs.Count > 0 && !string.IsNullOrEmpty(VocVMs[0].Exception))
+        {
+            await JSRuntime.Notfication(VocVMs[0].Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+
+    public void RowSelectHandler(RowSelectEventArgs<VocVM> args)
+    {
+        NavigationManager.NavigateTo($"voc/{args.Data.Voc.Id}");
+    }
+}
+
+
+ <style>
+            .e-grid .e-headercelldiv {
+                background-color: #F2F3F4;
+                font-size: 16px;
+            }
+
+            .e-grid .e-rowcell {
+                font-size: 14px;
+            }
+ </style>

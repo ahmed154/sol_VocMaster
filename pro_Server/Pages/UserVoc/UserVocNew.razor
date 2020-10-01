@@ -1,0 +1,48 @@
+@page "/uservoc/new"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/uservoc" style="color:#6372C4">UserVocs</a> /  New</span>
+        </div>
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/uservoc"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <UserVocForm UserVocVM="UserVocVM" ecb_Save="Create" Type="New" @ref="Form" />
+</div>
+
+
+@code
+{
+    [Inject] public IUserVocService UserVocService { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    protected UserVocForm Form;
+    UserVocVM UserVocVM { get; set; } = new UserVocVM();
+
+    private async Task Save()
+    {
+        await Form.ParentSubmit();
+    }
+    private async Task Create()
+    {
+        UserVocVM.Exception = null;
+        UserVocVM createdUserVocVM = await UserVocService.CreateUserVoc(UserVocVM);
+
+        if (string.IsNullOrEmpty(createdUserVocVM.Exception))
+        {
+            await JSRuntime.Notfication($"UserVoc {UserVocVM.UserVoc.Voc.Text} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+            //NavigationManager.NavigateTo($"/uservoc/{createdUserVocVM.UserVoc.Id}");
+        }
+        else
+        {
+            await JSRuntime.Notfication(createdUserVocVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+}

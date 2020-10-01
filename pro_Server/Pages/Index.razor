@@ -1,0 +1,83 @@
+﻿@page "/"
+@page "/index"
+
+
+@using pro_Server.Pages.Voc
+@inherits MainBase
+
+
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="center">
+            <span style="color:#2C3E50;font-size:100px;">Voc</span><span style="font-size:100px;color:#2C3E50">Wiki</span>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <br />
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <EditForm Model="@VocVM" OnValidSubmit=@Search class="card card-sm">
+                <div class="card-body row no-gutters align-items-center">
+                    <div class="col-auto">
+                        <i class="fas fa-search h4 text-body"></i>
+                    </div>
+                    <!--end of col-->
+                    <div class="col">
+                        <InputText @bind-Value="@VocVM.Voc.Text" class="form-control form-control-lg form-control-borderless" type="search" placeholder="Search In More Than 50,000 Vocabulary"/>
+                    </div>
+                    <!--end of col-->
+                    <div class="col-auto">
+                        <button class="btn btn-lg btn-success" type="submit">Search</button>
+                    </div>
+                    <!--end of col-->
+                </div>
+            </EditForm>
+        </div>
+        <!--end of col-->
+    </div>
+</div>
+
+
+@code
+{ 
+    [Inject] public NavigationManager NavigationManager { get; set; }
+    public VocVM VocVM { get; set; } = new VocVM();
+
+    async Task Search()
+    {
+        if(string.IsNullOrWhiteSpace(VocVM.Voc.Text))
+        {
+
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/search/{VocVM.Voc.Text.Trim()}");             
+        }
+    }
+}
+
+
+<style>
+    .center {
+        width: 100%;
+        text-align: center;
+    }
+
+
+    .form-control-borderless {
+        border: none;
+    }
+
+    .form-control-borderless:hover, .form-control-borderless:active, .form-control-borderless:focus {
+        border: none;
+        outline: none;
+        box-shadow: none;
+    }
+
+
+
+
+</style>

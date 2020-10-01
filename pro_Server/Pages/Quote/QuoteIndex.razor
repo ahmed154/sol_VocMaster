@@ -1,0 +1,70 @@
+@page "/quote"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;">Quotes</span>
+        </div>
+        <div class="row pt-4">
+            <a class="btn btn-primary" href="/quote/new" style="background-color:#6372C4"><i class="far fa-file"></i> New</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    @if (QuoteVMs == null)
+    {
+        <p style="color:gray;">Loading ...</p>
+    }
+    else if (QuoteVMs.Count() == 0)
+    {
+        <p style="color:gray;">No records to display.</p>
+    }
+    else
+    {
+        <SfGrid DataSource="@QuoteVMs" AllowPaging="true" AllowSorting="true">
+            <GridEvents RowSelected="RowSelectHandler" TValue="QuoteVM"></GridEvents>
+            <GridPageSettings PageSize="10" />
+            <GridColumns>
+                <GridColumn Field="Quote.Id" HeaderText="ID" Width="50" />
+                <GridColumn Field="Quote.Name" HeaderText="Name" Width="200" />
+            </GridColumns>
+        </SfGrid>
+    }
+</div>
+
+
+@code 
+{
+    [Inject] public IQuoteService QuoteService { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+
+    public List<QuoteVM> QuoteVMs { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        QuoteVMs =(await QuoteService.GetQuotes()).OrderByDescending(x => x.Quote.Id).ToList();
+        if (QuoteVMs.Count > 0 && !string.IsNullOrEmpty(QuoteVMs[0].Exception))
+        {
+            await JSRuntime.Notfication(QuoteVMs[0].Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+
+    public void RowSelectHandler(RowSelectEventArgs<QuoteVM> args)
+    {
+        NavigationManager.NavigateTo($"quote/{args.Data.Quote.Id}");
+    }
+}
+
+
+ <style>
+            .e-grid .e-headercelldiv {
+                background-color: #F2F3F4;
+                font-size: 16px;
+            }
+
+            .e-grid .e-rowcell {
+                font-size: 14px;
+            }
+ </style>

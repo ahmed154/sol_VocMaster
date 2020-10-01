@@ -1,0 +1,50 @@
+@page "/image/new"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        @*<div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/image" style="color:#6372C4">Images</a> /  New</span>
+        </div>*@
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/image"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <ImageForm ImageVM="ImageVM" ecb_Save="Create" Type="New" @ref="Form" />
+</div>
+
+
+@code
+{
+    [Inject] public IImageService ImageService { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    [Parameter] public ImageVM ImageVM { get; set; }
+
+    protected ImageForm Form;
+
+
+    private async Task Save()
+    {
+        await Form.ParentSubmit();
+    }
+    private async Task Create()
+    {
+        ImageVM.Exception = null;
+        ImageVM createdImageVM = await ImageService.CreateImage(ImageVM);
+
+        if (string.IsNullOrEmpty(createdImageVM.Exception))
+        {
+            await JSRuntime.Notfication($"Image {ImageVM.Image.Comment} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+            //NavigationManager.NavigateTo($"/image/{createdImageVM.Image.Id}");
+        }
+        else
+        {
+            await JSRuntime.Notfication(createdImageVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+}

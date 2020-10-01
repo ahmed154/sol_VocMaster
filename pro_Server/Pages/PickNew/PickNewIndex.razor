@@ -1,0 +1,116 @@
+@page "/picknew"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;">PickNews</span>
+        </div>
+        <div class="row pt-4">
+            <a class="btn btn-primary" href="/picknew/new" style="background-color:#6372C4"><i class="far fa-file"></i> New</a>
+            <button class="btn rounded">@PickedCount</button>
+
+            @if (bol_Study)
+            {
+                <a @onclick=@Study class="btn rounded bg-success" disabled=@bol_Study>Study</a>
+            }
+        </div>
+     
+    </div>
+
+
+    
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    @if (PickNewVM == null)
+    {
+        <p style="color:gray;">Loading ...</p>
+    }
+    else if (PickNewVM.Vocs.Count() == 0)
+    {
+        <p style="color:gray;">No records to display.</p>
+    }
+    else
+    {
+        @foreach (var voc in PickNewVM.Vocs)
+        {
+            <div class="row">
+
+                <div class="col-2 offset-3">
+                    <button @onclick="(()=>Yes(voc))" class="btn border">Yes</button>
+                </div>
+                <div class="col-2">
+                    <span>@voc.Text</span>
+                </div>
+                <div class="col-2">
+                    <button @onclick="(()=>No(voc))" class="btn border">No</button>
+                </div>
+
+            </div>
+        }
+    }
+</div>
+
+
+@code 
+{
+    [CascadingParameter] public MainLayout.AppParam appParam { get; set; }
+    [Inject] public IPickNewService PickNewService { get; set; }
+    [Inject] public IUserVocService UserVocService { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] public IMyService MyService { get; set; }
+
+
+    public PickNewVM PickNewVM { get; set; } = new PickNewVM();
+    private string userName;
+
+    public int PickedCount { get; set; }
+    public bool bol_Study { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        userName = await JSRuntime.GetFromLocalStorage("Email");
+
+        PickNewVM.UserId = userName ;
+
+        PickNewVM = await PickNewService.GetPickNew(PickNewVM);
+        if (!string.IsNullOrEmpty(PickNewVM.Exception))
+        {
+            await JSRuntime.Notfication(PickNewVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+
+    void Yes(Voc voc)
+    {
+        PickNewVM.Vocs.Remove(voc);
+    }
+    async Task No(Voc voc)
+    {
+        appParam.StudyUserVocVMs.Add(new UserVocVM { UserVoc = new UserVoc { UserId = userName, VocId = voc.Id } });
+        MyService.CallRequestRefresh();
+
+        var UserVocVm = await UserVocService.CreateUserVoc(new UserVocVM { UserVoc = new UserVoc { UserId = userName, VocId = voc.Id } });
+
+        if (!string.IsNullOrEmpty(UserVocVm.Exception))
+        {
+            await JSRuntime.Notfication(UserVocVm.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+        else
+        {
+            PickNewVM.Vocs.Remove(voc);
+            PickedCount++;
+            if(PickedCount >= 3)
+            {
+                bol_Study = true;
+            }
+        }
+    }
+    async Task Study()
+    {
+        MyService.CallRequestRefreshUserVocChech();
+        NavigationManager.NavigateTo("voc/study");
+    }
+}
+
+
