@@ -19,5 +19,6 @@ namespace pro_Models.Models
         public List<Image> Images { get; set; }
         public List<VocsQuotes> VocsQuotes { get; set; }
         public List<VocsIdioms> VocsIdioms { get; set; }
+        public List<VocsPhrases> VocsPhrases { get; set; }
     }
 }

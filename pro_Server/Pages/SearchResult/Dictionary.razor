@@ -1,0 +1,95 @@
+﻿
+
+<div class="container ml-4">
+    <div class="row">
+        <div class="col-auto"> <span style="font-size:30px;color:transparent">&emsp;&emsp;&emsp;&emsp;&nbsp;</span></div>
+        <div class="col">
+            <div class="row">
+                <h4 style="font-size:40px;"><b>@Voc.Text</b></h4>
+            </div>
+            <div class="row">
+                @if (Voc.VocAudios != null && Voc.VocAudios.Count > 0)
+                {
+                    <audio id="audio" src=@Voc.VocAudios[0].Uri autoplay></audio>
+                    <button @onclick=@PlaySound class="btn" style="border:none;"><i class="fas fa-volume-up"></i></button>
+                    <span style="margin-top:7px;">@Voc.VocAudios[0].Phon</span>
+                }
+            </div>
+
+            @if (Voc.Definitions != null && Voc.Definitions.Count > 0)
+            {
+                <div class="row mt-4">
+                    <div class="col">
+                        <div class="row">
+                            <h3>Difinitions and Examples</h3>
+                        </div>
+                        <div class="row ml-1">
+                            <table>
+
+                                @foreach (var dif in Voc.Definitions)
+                                {
+                                    <tr style="color:navy; font-family:'Tajawal'; font-weight: bold; font-size: 20px;">@dif.Text</tr>
+
+                                    @foreach (var example in dif.Examples)
+                                    {
+                                        <tr class="ml-1" style="font-family:'Tajawal'; font-size: 18px; ">
+                                            @example.Text
+                                        </tr>
+                                    }
+                                }
+
+                            </table>
+                        </div>
+                    </div>
+                </div><hr />
+            }
+
+            @if (Voc.Synonyms != null && Voc.Synonyms.Count > 0)
+            {
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <h3>Synonyms</h3>
+                        </div>
+                        <div class="row ml-1">
+                            @foreach (var syn in Voc.Synonyms)
+                            {
+                                <span style="color:navy; font-family:'Tajawal'; background-color:#F2F4F4; padding:0px 3px 0px 3px; margin-right:3px;">@syn.Text</span>
+                            }
+                        </div>
+                    </div>
+                </div><hr />
+            }
+
+            @if (Voc.Translates != null && Voc.Translates.Count > 0)
+            {
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <h3>Translation</h3>
+                        </div>
+                        <div class="row ml-1">
+                            @foreach (var translate in Voc.Translates)
+                            {
+                                <span style="color:navy; font-family:'Tajawal'; background-color:#F2F4F4; padding:0px 3px 0px 3px; margin-right:3px;">@translate.Text</span>
+                            }
+                        </div>
+                    </div>
+                </div><hr />
+            }
+        </div>
+    </div>
+</div>
+
+@code
+{
+    [Parameter] public Voc Voc { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] public ISearchResultService SearchResultService { get; set; }
+
+
+    public async Task PlaySound()
+    {
+        await JSRuntime.InvokeVoidAsync("playSound");
+    }
+}

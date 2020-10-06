@@ -19,8 +19,8 @@ namespace pro_Server
 {
     public class Startup
     {
-        string uri = "https://localhost:44305/";
-        //string uri = "http://ahmed154-001-site4.etempurl.com/";
+        //string uri = "https://localhost:44305/";
+        string uri = "http://ahmed154-001-site4.etempurl.com/";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -69,7 +69,8 @@ namespace pro_Server
             services.AddScoped<IInfluencerService, InfluencerService>();
             services.AddScoped<IQuoteService, QuoteService>();
             services.AddScoped<IIdiomService, IdiomService>();
-
+            services.AddScoped<IPhraseService, PhraseService>();
+            services.AddScoped<ISearchResultService, SearchResultService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

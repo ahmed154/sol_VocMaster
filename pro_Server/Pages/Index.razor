@@ -5,12 +5,14 @@
 @using pro_Server.Pages.Voc
 @inherits MainBase
 
-
+<div class="col" style="border: thin; text-align: right; margin-top: 15px;">
+    <LoginDisplay />
+</div>
 
 <div class="container mt-5">
     <div class="row">
         <div class="center">
-            <span style="color:#2C3E50;font-size:100px;">Voc</span><span style="font-size:100px;color:#2C3E50">Wiki</span>
+            <span style="color:#1b292a;font-size:100px;">Voc</span><span style="font-size:100px;color:#1b292a">Wiki</span>
         </div>
     </div>
 </div>
@@ -26,11 +28,11 @@
                     </div>
                     <!--end of col-->
                     <div class="col">
-                        <InputText @bind-Value="@VocVM.Voc.Text" class="form-control form-control-lg form-control-borderless" type="search" placeholder="Search In More Than 50,000 Vocabulary"/>
+                        <InputText @bind-Value="@VocVM.Voc.Text" id="txtSearch" class="form-control form-control-lg form-control-borderless" type="search" placeholder="Search In More Than 50,000 Vocabulary" />
                     </div>
                     <!--end of col-->
                     <div class="col-auto">
-                        <button class="btn btn-lg btn-success" type="submit">Search</button>
+                        <button class="btn btn-lg btn-success" style="background-color:#2f5f1d" type="submit">Search</button>
                     </div>
                     <!--end of col-->
                 </div>
@@ -42,22 +44,28 @@
 
 
 @code
-{ 
-    [Inject] public NavigationManager NavigationManager { get; set; }
+{
     public VocVM VocVM { get; set; } = new VocVM();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("FocusElement", "txtSearch");
+    }
 
     async Task Search()
     {
-        if(string.IsNullOrWhiteSpace(VocVM.Voc.Text))
+        if (string.IsNullOrWhiteSpace(VocVM.Voc.Text))
         {
 
         }
         else
         {
-            NavigationManager.NavigateTo($"/search/{VocVM.Voc.Text.Trim()}");             
+            NavigationManager.NavigateTo($"/search/{VocVM.Voc.Text.Trim()}");
         }
     }
-}
+
+
+ }
 
 
 <style>
@@ -71,13 +79,9 @@
         border: none;
     }
 
-    .form-control-borderless:hover, .form-control-borderless:active, .form-control-borderless:focus {
-        border: none;
-        outline: none;
-        box-shadow: none;
-    }
-
-
-
-
+        .form-control-borderless:hover, .form-control-borderless:active, .form-control-borderless:focus {
+            border: none;
+            outline: none;
+            box-shadow: none;
+        }
 </style>

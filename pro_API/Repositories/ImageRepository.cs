@@ -58,9 +58,7 @@ namespace pro_API.Repositories
         }
         public async Task<ImageVM> CreateImage(ImageVM imageVM)
         {
-            appDbContext.Entry(imageVM.Image.Voc).State = EntityState.Detached;
             var result = await appDbContext.Images.AddAsync(imageVM.Image);
-            appDbContext.Entry(imageVM.Image.Voc).State = EntityState.Modified;
 
             await appDbContext.SaveChangesAsync();
 

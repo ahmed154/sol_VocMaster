@@ -13,6 +13,5 @@ namespace pro_Models.Models
         public string Phon { get; set; }
         public int VocId { get; set; }
         /////////////////////////////////////////////////////////
-        public Voc Voc { get; set; } 
     }
 }

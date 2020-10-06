@@ -239,8 +239,18 @@ namespace pro_API.Repositories
                 .Include(x => x.Images)
                 .Include(x => x.VocSubtitles).ThenInclude(x => x.Subtitle).ThenInclude(x => x.Movie)
                 .Include(x => x.VocsQuotes).ThenInclude(x => x.Quote).ThenInclude(x => x.Influencer)
+                .Include(x => x.VocsPhrases).ThenInclude(x => x.Phrase)
                 .FirstOrDefaultAsync(x => x.Text == vocVM.Voc.Text);
 
+            foreach (var vocPhrase in vocVM.Voc.VocsPhrases)
+            {
+                vocPhrase.Voc = null;
+                vocPhrase.Phrase.VocsPhrases = null;
+                vocPhrase.Phrase.Text = vocPhrase.Phrase.Text.Replace(vocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{vocVM.Voc.Text}</mark>");
+                vocPhrase.Phrase.Text = vocPhrase.Phrase.Text.Replace(vocVM.Voc.Text.Substring(0, 1).ToUpper() + vocVM.Voc.Text.Substring(1), 
+                    $"<mark style=\"background-color: #FCF3CF;\">{vocVM.Voc.Text.Substring(0, 1).ToUpper() + vocVM.Voc.Text.Substring(1)}</mark>");
+
+            }
             return vocVM;
         }
     }

@@ -1,0 +1,54 @@
+@page "/phrase/edit/{id:int}"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/phrase" style="color:#6372C4">Phrases</a>  /  @id</span>
+        </div>
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/phrase/@id"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <PhraseForm PhraseVM="PhraseVM" ecb_Save="Update" Type="Edit" @ref="Form"/>
+</div>
+
+    @code {
+
+        [Inject] public IPhraseService PhraseService { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+        [Parameter] public int id { get; set; }
+
+        PhraseVM PhraseVM { get; set; } = new PhraseVM();
+        protected PhraseForm Form;
+
+        protected override async Task OnInitializedAsync()
+        {
+            PhraseVM = await PhraseService.GetPhrase(id);
+        }
+
+        private async Task Save()
+        {
+            await Form.ParentSubmit();
+        }
+
+        private async Task Update()
+        {
+            PhraseVM.Exception = null;
+            PhraseVM updatedPhraseVM = await PhraseService.UpdatePhrase(PhraseVM.Phrase.Id, PhraseVM);
+
+            if (string.IsNullOrEmpty(updatedPhraseVM.Exception))
+            {
+                await JSRuntime.Notfication($"Phrasement {PhraseVM.Phrase.Text} has been updated successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                NavigationManager.NavigateTo($"/phrase/{updatedPhraseVM.Phrase.Id}");
+            }
+            else
+            {
+                await JSRuntime.Notfication(updatedPhraseVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+        }
+    }

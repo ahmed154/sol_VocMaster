@@ -19,7 +19,6 @@ namespace pro_Models.Models
         public string Summary { get; set; }
         public int LangId { get; set; } = 1;
         ///////////////////////////////////////////////////////////////////
-        public Lang Lang { get; set; }
         public List<Subtitle> Subtitles { get; set; }
     }
 }

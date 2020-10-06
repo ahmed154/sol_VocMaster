@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using pro_API.Data;
 
 namespace pro_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201002201156_SomeEdits")]
+    partial class SomeEdits
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -268,13 +270,9 @@ namespace pro_API.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Text")
-                        .IsUnique();
 
                     b.ToTable("Idioms");
                 });
@@ -389,25 +387,6 @@ namespace pro_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Movies");
-                });
-
-            modelBuilder.Entity("pro_Models.Models.Phrase", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Text")
-                        .IsUnique();
-
-                    b.ToTable("Phrases");
                 });
 
             modelBuilder.Entity("pro_Models.Models.Quote", b =>
@@ -716,28 +695,6 @@ namespace pro_API.Migrations
                     b.ToTable("VocsIdioms");
                 });
 
-            modelBuilder.Entity("pro_Models.Models.VocsPhrases", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("PhraseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VocId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PhraseId");
-
-                    b.HasIndex("VocId");
-
-                    b.ToTable("VocsPhrases");
-                });
-
             modelBuilder.Entity("pro_Models.Models.VocsQuotes", b =>
                 {
                     b.Property<int>("Id")
@@ -945,21 +902,6 @@ namespace pro_API.Migrations
 
                     b.HasOne("pro_Models.Models.Voc", "Voc")
                         .WithMany("VocsIdioms")
-                        .HasForeignKey("VocId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("pro_Models.Models.VocsPhrases", b =>
-                {
-                    b.HasOne("pro_Models.Models.Phrase", "Phrase")
-                        .WithMany("VocsPhrases")
-                        .HasForeignKey("PhraseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("pro_Models.Models.Voc", "Voc")
-                        .WithMany("VocsPhrases")
                         .HasForeignKey("VocId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

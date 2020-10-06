@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+    <UserSecretsId>01f3b849-4202-4413-9e6f-4060c11e9903</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,6 +38,10 @@
     <Compile Remove="Migrations\20200926175208_Add-VocsSubtitless.Designer.cs" />
     <Compile Remove="Migrations\20200930160640_Influencer.cs" />
     <Compile Remove="Migrations\20200930160640_Influencer.Designer.cs" />
+    <Compile Remove="Migrations\20201003201937_Phrase.cs" />
+    <Compile Remove="Migrations\20201003201937_Phrase.Designer.cs" />
+    <Compile Remove="Migrations\20201006151442_Idioms-AddUniqText.cs" />
+    <Compile Remove="Migrations\20201006151442_Idioms-AddUniqText.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

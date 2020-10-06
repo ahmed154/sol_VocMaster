@@ -1,4 +1,7 @@
-﻿function playSound() {
-    var sound = document.getElementById("audio");
+﻿function playSound(id) {
+    var sound = document.getElementById(id);
     sound.play();
 }
+function FocusElement(id) {
+    document.getElementById(id).focus();
+} 

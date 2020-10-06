@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using pro_API.Data;
 
 namespace pro_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201003202357_Phrase")]
+    partial class Phrase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -268,13 +270,9 @@ namespace pro_API.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Text")
-                        .IsUnique();
 
                     b.ToTable("Idioms");
                 });
@@ -953,13 +951,13 @@ namespace pro_API.Migrations
             modelBuilder.Entity("pro_Models.Models.VocsPhrases", b =>
                 {
                     b.HasOne("pro_Models.Models.Phrase", "Phrase")
-                        .WithMany("VocsPhrases")
+                        .WithMany()
                         .HasForeignKey("PhraseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("pro_Models.Models.Voc", "Voc")
-                        .WithMany("VocsPhrases")
+                        .WithMany()
                         .HasForeignKey("VocId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -1,0 +1,98 @@
+﻿
+@if (DictionaryApiDev != null)
+{
+    <div class="container ml-4">
+        <div class="row">
+            <div class="col-auto"> <span style="font-size:30px;color:transparent">&emsp;&emsp;&emsp;&emsp;&nbsp;</span></div>
+            <div class="col">
+                <div class="row">
+                    <h4 style="font-size:40px;"><b>@DictionaryApiDev.word</b></h4>
+                </div>
+
+                @if (DictionaryApiDev.phonetics != null && DictionaryApiDev.phonetics.Count > 0)
+                {
+                    @foreach (var phonetics in DictionaryApiDev.phonetics)
+                    {
+                        <div class="row">
+
+                                <audio id=@("audio" + DictionaryApiDev.phonetics.IndexOf(phonetics)) src=@phonetics.audio ></audio>
+                                <button @onclick=@(()=>PlaySound("audio"  + DictionaryApiDev.phonetics.IndexOf(phonetics))) class="btn" style="border:none;"><i class="fas fa-volume-up"></i></button>
+                                <span style="margin-top:7px;">@phonetics.text</span>
+                    
+                        </div>
+                    }
+                }
+
+
+                @if (DictionaryApiDev.meanings != null && DictionaryApiDev.meanings.Count > 0)
+                {
+                    <div class="row mt-5">
+                        <div class="col">
+                                    
+                            @foreach (var mean in DictionaryApiDev.meanings)
+                            {
+                                <div class="row"><span style="background-color: #F7DC6F; padding:5px; border-radius:10%"><b>@mean.partOfSpeech</b></span></div>
+                                @foreach (var dif in mean.definitions)
+                                {
+                                    <div class="row" style="color:navy; font-family:'Tajawal'; font-weight: bold; font-size: 20px;">@dif.definition</div>
+
+                                    <div class="row ml-1" style="font-family:'Tajawal'; font-size: 18px; ">
+                                        @if(!string.IsNullOrEmpty(dif.example))
+                                        {
+                                            <span>Example: &emsp;</span>@dif.example
+                                        }
+                                    </div>
+
+                                    @if (dif.synonyms != null && dif.synonyms.Count > 0)
+                                    {
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="row">
+                                                </div>
+                                                <div class="row ml-1">
+                                                    <span>Synonyms: &emsp;</span>
+                                                    @foreach (var syn in dif.synonyms)
+                                                    {
+                                                        <span style="color:navy; font-family:'Tajawal'; background-color:#F2F4F4; padding:0px 3px 0px 3px; margin-right:3px;">@syn</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>   
+                                    }
+                            <hr />
+                                }
+                            }
+
+                
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code
+{
+    [Parameter] public Voc Voc { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] public ISearchResultService SearchResultService { get; set; }
+
+    DictionaryApiDev DictionaryApiDev;
+
+    protected override async Task OnInitializedAsync()
+    {
+        DictionaryApiDev = await SearchResultService.GetDictionaryApiDev(Voc.Text);
+    }
+
+    public async Task RefreshMe(string txt)
+    {
+        DictionaryApiDev = await SearchResultService.GetDictionaryApiDev(txt);
+        StateHasChanged();
+    }
+
+    public async Task PlaySound(string id)
+    {
+        await JSRuntime.InvokeVoidAsync("playSound", id);
+    }
+}

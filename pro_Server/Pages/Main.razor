@@ -25,69 +25,80 @@
 
         @if (bol_New)
         {
-<div class="container bg-white border box-shadow p-3 rounded">
-    @if (VocMasterVM.News == null)
-    {
-<p style="color:gray;">Loading ...</p> }
-else if (VocMasterVM.News.Count() == 0)
-{ @*<p style="color:gray;">No records to display.</p>*@
-                        <button @onclick=@Study class="btn rounded">Study New Vocabulary</button> }
-                    else
-                    {
-<div class="container bg-white border box-shadow p-3 rounded">
-    <div class="row ml-3">
-        <h4 style="font-size:20px;"><b>#@VocMasterVM.News[0].Voc.Id</b></h4>
-    </div>
-    <div class="row mt-5 ml-3">
-        <h4 style="font-size:40px;"><b>@VocMasterVM.News[0].Voc.Text</b></h4>
-    </div>
-    <div class="row ml-3">
-        @if (VocMasterVM.News[0].VocAudios.Count > 0)
+            <div class="container bg-white border box-shadow p-3 rounded">
+                @if (VocMasterVM.News == null)
+                {
+                    <p style="color:gray;">Loading ...</p> 
+                }
+                else if (VocMasterVM.News.Count() == 0)
+                { 
+                    @*<p style="color:gray;">No records to display.</p>*@
+                    <button @onclick=@Study class="btn rounded">Study New Vocabulary</button> 
+                }
+                else
+                {
+                    <div class="container bg-white border box-shadow p-3 rounded">
+                        <div class="row ml-3">
+                            <h4 style="font-size:20px;"><b>#@VocMasterVM.News[0].Voc.Id</b></h4>
+                        </div>
+                        <div class="row mt-5 ml-3">
+                            <h4 style="font-size:40px;"><b>@VocMasterVM.News[0].Voc.Text</b></h4>
+                        </div>
+                        <div class="row ml-3">
+                            @if (VocMasterVM.News[0].VocAudios.Count > 0)
+                            {
+                                <audio id="audio" src=@VocMasterVM.News[0].VocAudios[0].Uri autoplay></audio>
+                                <button @onclick=@PlaySound class="btn" style="border:none;"><i class="fas fa-volume-up"></i></button>
+                                <span style="margin-top:7px;">@VocMasterVM.News[0].VocAudios[0].Phon</span> 
+                            }
+                            else
+                            {
+                                <span style="margin-top:33px;"></span>
+                            }
+                         </div>
+
+                        <div class="row mt-5 ml-3">
+                            <button @onclick=@PickNewYes class="btn btn-success">I know it</button>
+                            <button @onclick=@PickNewNo class="btn btn-danger ml-2">I don't know it</button>
+                        </div>
+                    </div>
+                }
+            </div> 
+        }
+
+        else if (bol_Study)
         {
-<audio id="audio" src=@VocMasterVM.News[0].VocAudios[0].Uri autoplay></audio>
-                            <button @onclick=@PlaySound class="btn" style="border:none;"><i class="fas fa-volume-up"></i></button>
-                                                        <span style="margin-top:7px;">@VocMasterVM.News[0].VocAudios[0].Phon</span> }
-                                                                                else
-                                                                                {
-                                                        <span style="margin-top:33px;"></span>}
-    </div>
+            <div class="container bg-white border box-shadow p-3 rounded">
 
-    <div class="row mt-5 ml-3">
-        <button @onclick=@PickNewYes class="btn btn-success">I know it</button>
-        <button @onclick=@PickNewNo class="btn btn-danger ml-2">I don't know it</button>
-    </div>
-</div>}
-</div> }
+                @if (VocMasterVM.Studys.Count > 0)
+                {
+                    <div class="row float-right">
+                        <button @onclick=@StudyNexy class="btn rounded">Next</button>
+                    </div>
+                }
 
-else if (bol_Study)
-{
-<div class="container bg-white border box-shadow p-3 rounded">
-
-    @if (VocMasterVM.Studys.Count > 0)
-    {
-<div class="row float-right">
-    <button @onclick=@StudyNexy class="btn rounded">Next</button>
-</div>}
-
-    @if (VocMasterVM.Studys.Count == 0)
-    {
-<div class="row pt-4">
-    <button @onclick=@PickNew class="btn rounded">Pick New Vocabulary</button>
-</div> }
-else
-{
-<div class="row">
-    @if (TimeLeft > new TimeSpan())
-    {
-<span>Next test -> @TimeLeft</span> }
+                @if (VocMasterVM.Studys.Count == 0)
+                {
+                    <div class="row pt-4">
+                        <button @onclick=@PickNew class="btn rounded">Pick New Vocabulary</button>
+                    </div> 
+                }
+                else
+                {
+                    <div class="row">
+                        @if (TimeLeft > new TimeSpan())
+                        {
+                            <span>Next test -> @TimeLeft</span> 
+                        }
                         else if (TimeLeft == new TimeSpan())
                         {
-<span>Next test -> Now</span>}
+                            <span>Next test -> Now</span>
+                        }
                         else
                         {
                         }
-</div>
-                        <div class="row mt-5">
+                    </div>
+                    <div class="row mt-5">
                             <div class="container ml-3">
                                 <div class="row">
                                     <h4 style="font-size:40px;"><b>@VocMasterVM.Studys[0].Voc.Text</b></h4>
@@ -96,9 +107,10 @@ else
                                 <div class="row">
                                     @if (VocMasterVM.Studys[0].VocAudios.Count > 0)
                                     {
-            <audio id="audio" src=@VocMasterVM.Studys[0].VocAudios[0].Uri autoplay></audio>
+                                        <audio id="audio" src=@VocMasterVM.Studys[0].VocAudios[0].Uri autoplay></audio>
                                         <button @onclick=@PlaySound class="btn" style="border:none;"><i class="fas fa-volume-up"></i></button>
-                                                                    <span style="margin-top:7px;">@VocMasterVM.Studys[0].VocAudios[0].Phon</span>}
+                                                                    <span style="margin-top:7px;">@VocMasterVM.Studys[0].VocAudios[0].Phon</span>
+                                    }
 
                                 </div>
                             </div>
@@ -108,30 +120,33 @@ else
                                 <table>
                                     @foreach (var dif in VocMasterVM.Studys[0].Definitions)
                                     {
-            <tr style="color:navy; font-family:'Tajawal'; font-weight: bold; font-size: 20px;">@dif.Text</tr>
+                                        <tr style="color:navy; font-family:'Tajawal'; font-weight: bold; font-size: 20px;">@dif.Text</tr>
 
                                         @foreach (var example in dif.Examples)
                                         {
-            <tr style="font-family:'Tajawal'; font-size: 18px; ">
-                @example.Text
-            </tr>
-}}
+                                            <tr style="font-family:'Tajawal'; font-size: 18px; ">
+                                                @example.Text
+                                            </tr>
+                                        }
+                                    }
                                 </table><hr />
                             </div>
 
                             <div class="container">
                                 <h3>Synonyms</h3>
-                                @foreach (var syn in VocMasterVM.Studys[0].Synonyms)
-                                {
-        <span style="font-family:'Tajawal'; background-color:#F2F4F4; padding:0px 3px 0px 3px;">@syn.Text</span>}
+                                    @foreach (var syn in VocMasterVM.Studys[0].Synonyms)
+                                    {
+                                        <span style="font-family:'Tajawal'; background-color:#F2F4F4; padding:0px 3px 0px 3px;">@syn.Text</span>
+                                    }
                                 <hr />
                             </div>
 
                             <div class="container">
                                 <h3>Translation</h3>
-                                @foreach (var translate in VocMasterVM.Studys[0].Translates)
-                                {
-        <span style="font-family:'Tajawal'; background-color:#F2F4F4; padding:0px 3px 0px 3px;">@translate.Text</span>}
+                                    @foreach (var translate in VocMasterVM.Studys[0].Translates)
+                                    {
+                                        <span style="font-family:'Tajawal'; background-color:#F2F4F4; padding:0px 3px 0px 3px;">@translate.Text</span>
+                                    }
                                 <hr />
                             </div>
 
@@ -234,25 +249,27 @@ else
                 <tbody>
                     @foreach (var subtitle in VocMasterVM.Studys[0].Subtitles)
                     {
-<tr>
-    <td>
-        @((subtitle.Movie.Name.Length >= 15)? subtitle.Movie.Name.Substring(0, 15) : subtitle.Movie.Name)
-    </td>
-    <td>
-        @((MarkupString)subtitle.Text)
-    </td>
+                        <tr>
+                            <td>
+                                @((subtitle.Movie.Name.Length >= 15)? subtitle.Movie.Name.Substring(0, 15) : subtitle.Movie.Name)
+                            </td>
+                            <td>
+                                @((MarkupString)subtitle.Text)
+                            </td>
 
-    @*<td>
-            <video width="320" controls>
-              <source src=@($"https://VocMasterPullZone.b-cdn.net/Movies/Clips/{subtitle.Index.PadLeft(4,'0')}.mp4") type="video/mp4">
-             </video>
-        </td>*@
-    <td @onclick="(() => PlayVid(subtitle.Id))">
-        <Clip Subtitle="subtitle" Clicked_Id="Clicked_Id" Pre_Clicked_Id="Pre_Clicked_Id" />
-    </td>
-</tr>}
+                            @*<td>
+                                    <video width="320" controls>
+                                      <source src=@($"https://VocMasterPullZone.b-cdn.net/Movies/Clips/{subtitle.Index.PadLeft(4,'0')}.mp4") type="video/mp4">
+                                     </video>
+                                </td>*@
+                            <td @onclick="(() => PlayVid(subtitle.Id))">
+                                <Clip Subtitle="subtitle" Clicked_Id="Clicked_Id" Pre_Clicked_Id="Pre_Clicked_Id" />
+                            </td>
+                        </tr>
+                    }
                 </tbody>
-            </table>}
+            </table>
+            }
 
                                 </div><hr />
                             </div>
@@ -264,7 +281,8 @@ else
                                 </div><hr />
                             </div>
                         </div>}
-</div> }
+            </div> 
+        }
 
 else if (bol_Test && VocMasterVM.Tests.Count > 0)
 {
@@ -278,10 +296,12 @@ else if (bol_Test && VocMasterVM.Tests.Count > 0)
         {
 <audio id="audio" src=@VocMasterVM.Tests[0].VocAudios[0].Uri autoplay></audio>
                         <button @onclick=@PlaySound class="btn" style="border:none;"><i class="fas fa-volume-up"></i></button>
-                                                <span style="margin-top:7px;">@VocMasterVM.Tests[0].VocAudios[0].Phon</span> }
+                                                <span style="margin-top:7px;">@VocMasterVM.Tests[0].VocAudios[0].Phon</span> 
+                                                }
                                                                     else
                                                                     {
-                                                <span style="margin-top:33px;"></span>}
+                                                <span style="margin-top:33px;"></span>
+                                                }
     </div>
 
     <div class="row mt-5 ml-3">

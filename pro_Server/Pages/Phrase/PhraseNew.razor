@@ -1,0 +1,48 @@
+@page "/phrase/new"
+
+<div class="container bg-white rounded border p-3">
+    <div class="pl-3">
+        <div class="row">
+            <span style="font-size:18px; color:#8f8f8f;"><a href="/phrase" style="color:#6372C4">Phrases</a> /  New</span>
+        </div>
+        <div class="row pt-4">
+            <button class="btn btn-primary" type="submit" @onclick=@(()=> Save()) style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+            <a class="btn border ml-1" href="/phrase"><i class="fas fa-undo"></i> Cancel</a>
+        </div>
+    </div>
+</div>
+
+<div class="container bg-white border box-shadow p-3 rounded">
+    <PhraseForm PhraseVM="PhraseVM" ecb_Save="Create" Type="New" @ref="Form" />
+</div>
+
+
+@code
+{
+    [Inject] public IPhraseService PhraseService { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    protected PhraseForm Form;
+    PhraseVM PhraseVM { get; set; } = new PhraseVM();
+
+    private async Task Save()
+    {
+        await Form.ParentSubmit();
+    }
+    private async Task Create()
+    {
+        PhraseVM.Exception = null;
+        PhraseVM createdPhraseVM = await PhraseService.CreatePhrase(PhraseVM);
+
+        if (string.IsNullOrEmpty(createdPhraseVM.Exception))
+        {
+            await JSRuntime.Notfication($"Phrase {PhraseVM.Phrase.Text} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+            NavigationManager.NavigateTo($"/phrase/{createdPhraseVM.Phrase.Id}");
+        }
+        else
+        {
+            await JSRuntime.Notfication(createdPhraseVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+        }
+    }
+}

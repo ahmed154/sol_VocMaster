@@ -1,0 +1,126 @@
+﻿@page "/search/{txt}"
+
+<div class="container-fluid">
+    <div class="row">
+
+        <a href="" class="col-auto" style="margin-top: 15px; text-decoration: none;">
+            <span style="font-size:30px;color:#1b292a">VocWiki</span>
+        </a>
+
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="col-8" style="margin-top: 17px;">
+                <EditForm Model="@VocVM" OnValidSubmit=@Search class="card card-sm">
+                    <div class="row align-items-center" style="height: 45px;">
+                        <div class="col">
+                            <InputText @bind-Value="@VocVM.Voc.Text" class="form-control form-control-borderless" type="search" placeholder="Search In More Than 50,000 Vocabulary" />
+                        </div>
+
+                        <div class="col-auto form-control-borderless " style="margin-right:15px; border:none;">
+                            <button class="btn" type="submit"><i class="fas fa-search h4 text-body" style="margin-top:4px"></i></button>
+                        </div>
+
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+
+        <div class="col" style="border: thin; text-align: right; margin-top: 15px;">
+            <LoginDisplay />
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-auto"> <span style="font-size:30px;color:transparent">---------</span></div>
+
+        <div class="col-8" style="margin-top: 17px;">
+            <button @onclick=@(()=> CloseTabs("Dictionary")) class="btn">Dictionary</button>
+            <button @onclick=@(()=> CloseTabs("Images")) class="btn">Images</button>
+            <button @onclick=@(()=> CloseTabs("Videos")) class="btn">Videos</button>
+            <button @onclick=@(()=> CloseTabs("Quotes")) class="btn">Quotes</button>
+            <button @onclick=@(()=> CloseTabs("Idioms")) class="btn">Idioms</button>
+            <button @onclick=@(()=> CloseTabs("Phrases")) class="btn">Phrases</button>
+        </div>
+    </div>
+</div>
+
+@if (bol_Dictionary)
+{
+    <Com_DictionaryApiDev Voc="VocVM.Voc"  @ref="com_Dic"/>
+}
+else if (bol_Images)
+{
+    <Images Voc="VocVM.Voc" />
+}
+else if (bol_Phrases)
+{
+    <Phrases Voc="VocVM.Voc" />
+}
+
+@code {
+
+    [Parameter] public string txt { get; set; }
+    [Inject] public IVocMasterService VocMasterService { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+
+
+    public VocVM VocVM { get; set; } = new VocVM();
+
+    public bool bol_Dictionary { get; set; } = true;
+    public bool bol_Images { get; set; }
+    public bool bol_Videos { get; set; }
+    public bool bol_Quotes { get; set; }
+    public bool bol_Idioms { get; set; }
+    public bool bol_Phrases { get; set; }
+
+    protected Com_DictionaryApiDev com_Dic;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        VocVM.Voc.Text = txt;
+        VocVM.Exception = null;
+        VocVM = await VocMasterService.GetVocVMByText(VocVM);
+    }
+    #region Pro
+    void CloseTabs(string tap)
+    {
+        bol_Dictionary = (tap == "Dictionary") ? true : false;
+        bol_Images = (tap == "Images") ? true : false; ;
+        bol_Videos = (tap == "Videos") ? true : false; ;
+        bol_Quotes = (tap == "Quotes") ? true : false; ;
+        bol_Phrases = (tap == "Phrases") ? true : false; ;
+    }
+    #endregion
+
+    async Task Search()
+    {
+        if (string.IsNullOrEmpty(VocVM.Voc.Text.Trim()))
+        {
+
+        }
+        else
+        {
+            VocVM.Exception = null;
+            VocVM = await VocMasterService.GetVocVMByText(VocVM);
+            await com_Dic.RefreshMe(VocVM.Voc.Text);       
+        }
+    }
+
+    //public async Task PlaySound()
+    //{
+    //    await JSRuntime.InvokeVoidAsync("playSound");
+    //}
+}
+<style>
+    .form-control-borderless {
+        border: none;
+    }
+
+        .form-control-borderless:hover, .form-control-borderless:active, .form-control-borderless:focus {
+            border: none;
+            outline: none;
+            box-shadow: none;
+        }
+</style>

@@ -1,0 +1,39 @@
+﻿<div class="container ml-4">
+    <div class="row">
+        <div class="col-auto"> <span style="font-size:30px;color:transparent">&emsp;&emsp;&emsp;&emsp;&nbsp;</span></div>
+
+        <div class="col">
+
+            @if (Voc.VocsPhrases != null && Voc.VocsPhrases.Count > 0)
+            {
+                <div class="row mt-4">
+                    <div class="col">
+                        <div class="row">
+                            <h3>Common Phrases For "@Voc.Text"</h3>
+                        </div>
+                        <div class="row float-right">
+                            <a href="/phrase/new">Add Phrase</a>
+                        </div>
+                        <div class="row ml-1 mt-4">
+                            <table>
+
+                                @foreach (var vocPhrase in Voc.VocsPhrases)
+                                {
+                                    <tr style="height:40px; color:navy; font-family:'Tajawal'; font-weight: bold; font-size: 20px;">@((MarkupString)vocPhrase.Phrase.Text)</tr>
+                                }
+
+                            </table>
+                        </div>
+                    </div>
+                </div>          
+            }
+        </div>
+    </div>
+</div>
+
+@code
+{
+    [Parameter] public Voc Voc { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+
+}

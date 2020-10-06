@@ -17,6 +17,8 @@ namespace pro_API.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Voc>().HasIndex(u => u.Text).IsUnique();
+            builder.Entity<Phrase>().HasIndex(u => u.Text).IsUnique();
+            builder.Entity<Idiom>().HasIndex(u => u.Text).IsUnique();
             builder.Entity<UserVoc>().HasKey(t => new { t.UserId, t.VocId });
             //builder.Entity<VocsQuotes>().HasKey(t => new { t.VocId, t.QuoteId });
 
@@ -36,10 +38,11 @@ namespace pro_API.Data
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Subtitle> Subtitles { get; set; }
         public DbSet<VocTest> VocTests { get; set; }
-        public DbSet<Video> Videos { get; set; }
         public DbSet<VocSubtitle> VocsSubtitless { get; set; }
         public DbSet<Influencer> Influencers { get; set; }
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<Idiom> Idioms { get; set; }
+        public DbSet<Phrase> Phrases { get; set; }
+        public DbSet<VocsPhrases> VocsPhrases { get; set; }
     }
 }

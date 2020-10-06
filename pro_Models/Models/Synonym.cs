@@ -11,6 +11,5 @@ namespace pro_Models.Models
         [Required]
         public string Text { get; set; }
         public int VocId { get; set; }
-        public Voc Voc { get; set; }
     }
 }

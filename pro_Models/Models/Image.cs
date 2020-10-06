@@ -16,7 +16,5 @@ namespace pro_Models.Models
         public bool Liked { get; set; }
         public bool Disliked { get; set; }
         public int VocId { get; set; }
-        //////////////////////////////////////////////////////////////////////////////// 
-        public Voc Voc { get; set; }
     }
 }

@@ -575,7 +575,6 @@ namespace pro_Server.Pages
         }
         #endregion
 
-
         public async Task Study()
         {
             await OffSwiches();
@@ -619,7 +618,6 @@ namespace pro_Server.Pages
             if (!formContext.Validate()) return;
             ImageVM.Exception = null;
             ImageVM.Image.VocId = VocMasterVM.Studys[0].Voc.Id;
-            ImageVM.Image.Voc = VocMasterVM.Studys[0].Voc;
             ImageVM createdImageVM = await ImageService.CreateImage(ImageVM);
 
             if (string.IsNullOrEmpty(createdImageVM.Exception))
