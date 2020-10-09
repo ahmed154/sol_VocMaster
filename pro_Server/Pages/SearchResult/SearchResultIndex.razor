@@ -47,11 +47,19 @@
 
 @if (bol_Dictionary)
 {
-    <Com_DictionaryApiDev Voc="VocVM.Voc"  @ref="com_Dic"/>
+    <Com_DictionaryApiDev Voc="VocVM.Voc" @ref="com_Dic" />
 }
 else if (bol_Images)
 {
     <Images Voc="VocVM.Voc" />
+}
+else if (bol_Quotes)
+{
+    <Com_Quotes Voc="VocVM.Voc" />
+}
+else if (bol_Idioms)
+{
+    <Com_Idioms Voc="VocVM.Voc" />
 }
 else if (bol_Phrases)
 {
@@ -82,15 +90,42 @@ else if (bol_Phrases)
         VocVM.Voc.Text = txt;
         VocVM.Exception = null;
         VocVM = await VocMasterService.GetVocVMByText(VocVM);
+        await OptimizeVoc();
     }
     #region Pro
     void CloseTabs(string tap)
     {
         bol_Dictionary = (tap == "Dictionary") ? true : false;
-        bol_Images = (tap == "Images") ? true : false; ;
-        bol_Videos = (tap == "Videos") ? true : false; ;
-        bol_Quotes = (tap == "Quotes") ? true : false; ;
-        bol_Phrases = (tap == "Phrases") ? true : false; ;
+        bol_Images = (tap == "Images") ? true : false;
+        bol_Videos = (tap == "Videos") ? true : false;
+        bol_Quotes = (tap == "Quotes") ? true : false;
+        bol_Idioms = (tap == "Idioms") ? true : false;
+        bol_Phrases = (tap == "Phrases") ? true : false;
+    }
+    async Task OptimizeVoc()
+    {
+        foreach (var vocPhrase in VocVM.Voc.VocsPhrases)
+        {
+            vocPhrase.Phrase.Text = vocPhrase.Phrase.Text.Replace(VocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text}</mark>");
+            vocPhrase.Phrase.Text = vocPhrase.Phrase.Text.Replace(VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1),
+                $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1)}</mark>");
+        }
+
+        VocVM.Voc.VocsQuotes = VocVM.Voc.VocsQuotes.OrderBy(x => x.Quote.Text.Length).ToList();
+        foreach (var vocQuote in VocVM.Voc.VocsQuotes)
+        {
+            vocQuote.Quote.Text = vocQuote.Quote.Text.Replace(VocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text}</mark>");
+            vocQuote.Quote.Text = vocQuote.Quote.Text.Replace(VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1),
+            $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1)}</mark>");
+        }
+
+        VocVM.Voc.VocsIdioms = VocVM.Voc.VocsIdioms.OrderBy(x => x.Idiom.Text.Length).ToList();
+        foreach (var vocIdiom in VocVM.Voc.VocsIdioms)
+        {
+            vocIdiom.Idiom.Text = vocIdiom.Idiom.Text.Replace(VocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text}</mark>");
+            vocIdiom.Idiom.Text = vocIdiom.Idiom.Text.Replace(VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1),
+            $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1)}</mark>");
+        }
     }
     #endregion
 
@@ -104,7 +139,9 @@ else if (bol_Phrases)
         {
             VocVM.Exception = null;
             VocVM = await VocMasterService.GetVocVMByText(VocVM);
-            await com_Dic.RefreshMe(VocVM.Voc.Text);       
+            await com_Dic.RefreshMe(VocVM.Voc.Text);
+
+            await OptimizeVoc();
         }
     }
 

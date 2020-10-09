@@ -239,17 +239,25 @@ namespace pro_API.Repositories
                 .Include(x => x.Images)
                 .Include(x => x.VocSubtitles).ThenInclude(x => x.Subtitle).ThenInclude(x => x.Movie)
                 .Include(x => x.VocsQuotes).ThenInclude(x => x.Quote).ThenInclude(x => x.Influencer)
+                .Include(x => x.VocsIdioms).ThenInclude(x => x.Idiom)
                 .Include(x => x.VocsPhrases).ThenInclude(x => x.Phrase)
                 .FirstOrDefaultAsync(x => x.Text == vocVM.Voc.Text);
 
-            foreach (var vocPhrase in vocVM.Voc.VocsPhrases)
+            foreach (var vocPhrase in vocVM.Voc.VocsPhrases ?? Enumerable.Empty<VocsPhrases>())
             {
                 vocPhrase.Voc = null;
                 vocPhrase.Phrase.VocsPhrases = null;
-                vocPhrase.Phrase.Text = vocPhrase.Phrase.Text.Replace(vocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{vocVM.Voc.Text}</mark>");
-                vocPhrase.Phrase.Text = vocPhrase.Phrase.Text.Replace(vocVM.Voc.Text.Substring(0, 1).ToUpper() + vocVM.Voc.Text.Substring(1), 
-                    $"<mark style=\"background-color: #FCF3CF;\">{vocVM.Voc.Text.Substring(0, 1).ToUpper() + vocVM.Voc.Text.Substring(1)}</mark>");
-
+            }
+            foreach (var vocQuote in vocVM.Voc.VocsQuotes)
+            {
+                vocQuote.Voc = null;
+                vocQuote.Quote.VocsQuotes = null;
+                vocQuote.Quote.Influencer.Quotes = null;
+            }
+            foreach (var vocIdiom in vocVM.Voc.VocsIdioms)
+            {
+                vocIdiom.Voc = null;
+                vocIdiom.Idiom.VocsIdioms = null;
             }
             return vocVM;
         }

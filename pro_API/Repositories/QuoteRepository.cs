@@ -42,6 +42,33 @@ namespace pro_API.Repositories
         }
         public async Task<List<QuoteVM>> GetQuotes()
         {
+            //List<Quote> AllQuotes = appDbContext.Quotes.ToList();
+            //foreach (Quote quote in AllQuotes)
+            //{
+            //    foreach (string item in quote.Text.Split(' '))
+            //    {
+            //        try
+            //        {
+            //            Voc voc = await appDbContext.Vocs.FirstOrDefaultAsync(x => x.Text == item);
+
+            //            if (voc != null)
+            //            {
+            //                if (voc.VocsQuotes == null) voc.VocsQuotes = new List<VocsQuotes>();
+            //                voc.VocsQuotes.Add(new VocsQuotes { QuoteId = quote.Id });
+            //            }
+
+            //        }
+            //        catch (Exception ex)
+            //        {
+
+            //            throw;
+            //        }
+
+            //    }
+            //}
+            //await appDbContext.SaveChangesAsync();
+
+
             List<QuoteVM> quoteVMs = new List<QuoteVM>();
             var quotes = await appDbContext.Quotes.ToListAsync();
             foreach (var quote in quotes)

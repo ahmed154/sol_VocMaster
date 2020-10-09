@@ -4,20 +4,20 @@
 
         <div class="col">
 
-            @if (Voc.VocsPhrases != null && Voc.VocsPhrases.Count > 0)
+            @if (Voc.VocsIdioms != null && Voc.VocsIdioms.Count > 0)
             {
                 <div class="row mt-4">
                     <div class="col">
 
                         <div class="row float-right">
-                            <a href="/phrase/new">Add Phrase</a>
+                            <a href="/idiom/new">Add Idiom</a>
                         </div>
                         <div class="row ml-1 mt-4">
                             <table>
 
-                                @foreach (var vocPhrase in Voc.VocsPhrases)
+                                @foreach (var vocIdiom in Voc.VocsIdioms)
                                 {
-                                    <tr style="height:40px; color:navy; font-family:'Tajawal'; font-weight: bold; font-size: 16px;">@((MarkupString)vocPhrase.Phrase.Text)</tr>
+                                    <tr style="height:40px; color:navy; font-family:'Tajawal'; font-weight: bold; font-size: 16px;">@((MarkupString)vocIdiom.Idiom.Text)</tr>                                   
                                 }
 
                             </table>
@@ -37,7 +37,13 @@
     protected override Task OnInitializedAsync()
     {
 
-
         return base.OnInitializedAsync();
     }
 }
+
+<style>
+    .quoteStyle {
+        border: none;
+        border-bottom: 1px solid #eeeeee;
+    }
+</style>

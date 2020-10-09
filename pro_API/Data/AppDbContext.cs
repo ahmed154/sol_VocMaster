@@ -19,6 +19,8 @@ namespace pro_API.Data
             builder.Entity<Voc>().HasIndex(u => u.Text).IsUnique();
             builder.Entity<Phrase>().HasIndex(u => u.Text).IsUnique();
             builder.Entity<Idiom>().HasIndex(u => u.Text).IsUnique();
+            builder.Entity<PhrasalVerb>().HasIndex(u => u.Text).IsUnique();
+            builder.Entity<Influencer>().HasIndex(u => u.Name).IsUnique();
             builder.Entity<UserVoc>().HasKey(t => new { t.UserId, t.VocId });
             //builder.Entity<VocsQuotes>().HasKey(t => new { t.VocId, t.QuoteId });
 

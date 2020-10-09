@@ -42,10 +42,41 @@ namespace pro_API.Repositories
         }
         public async Task<List<IdiomVM>> GetIdioms()
         {
+            //List<Idiom> AllIdioms = appDbContext.Idioms.ToList();
+            //List<Voc> AllVocs = appDbContext.Vocs.ToList();
+            //Voc voc;
+
+            //foreach (Idiom idiom in AllIdioms)
+            //{
+            //    foreach (string item in idiom.Text.Split(' '))
+            //    {
+            //        try
+            //        {
+            //            voc = AllVocs.FirstOrDefault(x => x.Text == item);
+
+            //            if (voc != null)
+            //            {
+            //                if (voc.VocsIdioms == null) voc.VocsIdioms = new List<VocsIdioms>();
+            //                voc.VocsIdioms.Add(new VocsIdioms { IdiomId = idiom.Id });
+            //            }
+
+            //        }
+            //        catch (Exception ex)
+            //        {
+
+            //            throw;
+            //        }
+
+            //    }
+            //}
+            //await appDbContext.SaveChangesAsync();
+
+
             List<IdiomVM> idiomVMs = new List<IdiomVM>();
             var idioms = await appDbContext.Idioms.ToListAsync();
             foreach (var idiom in idioms)
             {
+                idiom.VocsIdioms = null;
                 idiomVMs.Add(new IdiomVM { Idiom = idiom});
             }
             return idiomVMs; 

@@ -3,21 +3,24 @@
         <a href="" class="btn">Add Image</a>
     </div>
     <div class="row">
-        @foreach (var image in Voc.Images)
+        @if(Voc.Images != null)
         {
-            <div class="row ml-1 mt-1">
-                <div class="col s12 m6">
-                    <div class="card p-1">
-                        <div class="card-image">
-                            <img src=@image.Uri>
-                        </div>
-                        <div class="card-content mt-2">
-                            <button @onclick=@(()=> Voc.Images.Remove(image)) class="btn shadow-none float-right"><i class="far fa-trash-alt"></i></button>
-                            <p style="max-width:270px">@image.Comment</p>
+            @foreach (var image in Voc.Images)
+            {
+                <div class="row ml-1 mt-1">
+                    <div class="col s12 m6">
+                        <div class="card p-1">
+                            <div class="card-image">
+                                <img src=@image.Uri>
+                            </div>
+                            <div class="card-content mt-2">
+                                <button @onclick=@(()=> Voc.Images.Remove(image)) class="btn shadow-none float-right"><i class="far fa-trash-alt"></i></button>
+                                <p style="max-width:270px">@image.Comment</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
         }
     </div>
 </div>

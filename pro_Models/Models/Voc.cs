@@ -20,5 +20,6 @@ namespace pro_Models.Models
         public List<VocsQuotes> VocsQuotes { get; set; }
         public List<VocsIdioms> VocsIdioms { get; set; }
         public List<VocsPhrases> VocsPhrases { get; set; }
+        public List<VocsPhrasalVerbs> VocsPhrasalVerbs { get; set; }
     }
 }
