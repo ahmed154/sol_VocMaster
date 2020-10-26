@@ -11,12 +11,9 @@ namespace pro_Models.Models
         [Required]
         public string Name { get; set; }
         [Required]
+        public string MovieId { get; set; }
+        [Required]
         public string Text { get; set; }
-        public int ReleaseYear { get; set; }
-        public string PosterUri { get; set; }
-        public string TrailerUri { get; set; }
-        public string MovierUri { get; set; }
-        public string Summary { get; set; }
         public int LangId { get; set; } = 1;
         ///////////////////////////////////////////////////////////////////
         public List<Subtitle> Subtitles { get; set; }

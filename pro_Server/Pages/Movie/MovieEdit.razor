@@ -43,7 +43,7 @@
 
             if (string.IsNullOrEmpty(updatedMovieVM.Exception))
             {
-                await JSRuntime.Notfication($"Moviement {MovieVM.Movie.Name} has been updated successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                await JSRuntime.Notfication($"Moviement {MovieVM.Movie.MovieId} has been updated successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
                 NavigationManager.NavigateTo($"/movie/{updatedMovieVM.Movie.Id}");
             }
             else

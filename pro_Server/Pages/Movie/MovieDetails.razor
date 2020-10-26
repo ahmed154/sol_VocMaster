@@ -34,7 +34,7 @@
 
         protected async Task DeleteConfirm()
         {
-            bool result = await JSRuntime.Confirm("Confirmation", $"Are you sure you want to delete {MovieVM.Movie.Name} ?", IJSRuntimeExtensionMethods.SweetAlertMessageType.question);
+            bool result = await JSRuntime.Confirm("Confirmation", $"Are you sure you want to delete {MovieVM.Movie.MovieId} ?", IJSRuntimeExtensionMethods.SweetAlertMessageType.question);
             if (result) await Delete();  
         }
         protected async Task Delete()
@@ -43,7 +43,7 @@
 
             if (string.IsNullOrEmpty(createdMovieVM.Exception))
             {
-                await JSRuntime.Notfication($"Moviement {MovieVM.Movie.Name} has been deleted successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+                await JSRuntime.Notfication($"Moviement {MovieVM.Movie.MovieId} has been deleted successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
                 NavigationManager.NavigateTo($"/movie");
             }
             else

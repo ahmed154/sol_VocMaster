@@ -37,7 +37,7 @@
 
         if (string.IsNullOrEmpty(createdMovieVM.Exception))
         {
-            await JSRuntime.Notfication($"Movie {MovieVM.Movie.Name} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+            await JSRuntime.Notfication($"Movie {MovieVM.Movie.MovieId} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
             NavigationManager.NavigateTo($"/movie");
         }
         else

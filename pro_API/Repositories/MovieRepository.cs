@@ -20,10 +20,14 @@ namespace pro_API.Repositories
         private readonly AppDbContext appDbContext;
         private readonly IMapper mapper;
 
+        List<Voc> vocList;
+
         public MovieRepository(AppDbContext appDbContext, IMapper mapper)
         {
             this.appDbContext = appDbContext;
             this.mapper = mapper;
+
+            vocList = appDbContext.Vocs.ToList();
         }
 
         #region Pro
@@ -71,22 +75,15 @@ namespace pro_API.Repositories
         }
         async Task<List<pro_Models.Models.VocSubtitle>> GetVocSubtitles(string txt)
         {
-            List<pro_Models.Models.VocSubtitle> vocSubtitles = new List<pro_Models.Models.VocSubtitle>();
-            List<string> wordList = new List<string>();
+            List<pro_Models.Models.VocSubtitle> vocSubtitles = new List<pro_Models.Models.VocSubtitle>();           
+            Voc dbVoc;
 
-            foreach (Voc voc in appDbContext.Vocs)
+            foreach (string word in txt.Split(" "))
             {
-                if (wordList.FirstOrDefault(x => x == voc.Text) != null) continue;
-
-                wordList.Add(voc.Text);
-                foreach (string word in txt.Split(" "))
-                {
-                    if (voc.Text == word)
-                    {
-                        vocSubtitles.Add(new pro_Models.Models.VocSubtitle { VocId = voc.Id });
-                    }
-                }
+                dbVoc = vocList.FirstOrDefault(x => x.Text == word);
+                if (dbVoc != null) vocSubtitles.Add(new pro_Models.Models.VocSubtitle { VocId = dbVoc.Id });                 
             }
+            
             return vocSubtitles;
         }
         #endregion
@@ -98,7 +95,7 @@ namespace pro_API.Repositories
 
             if (!string.IsNullOrEmpty(name))
             {
-                query = query.Where(e => e.Name.Contains(name));
+                query = query.Where(e => e.MovieId.Contains(name));
             }
 
             var movies = await query.ToListAsync();
@@ -112,7 +109,7 @@ namespace pro_API.Repositories
         public async Task<List<MovieVM>> GetMovies()
         {
             List<MovieVM> movieVMs = new List<MovieVM>();
-            var movies = await appDbContext.Movies.ToListAsync();
+            List<Movie> movies = await appDbContext.Movies.ToListAsync();
             foreach (var movie in movies)
             {
                 movieVMs.Add(new MovieVM { Movie = movie});
@@ -130,37 +127,39 @@ namespace pro_API.Repositories
             movieVM.Movie.Text = movieVM.Movie.Text.ToLower();
             movieVM.Movie.Text = Reformat(movieVM.Movie.Text);
 
-            string[] MovieContentList = movieVM.Movie.Text.Split("\r\n\r\n");
+            //string[] MovieContentList = movieVM.Movie.Text.Split("\r\n\r\n");
+            string[] MovieContentList = movieVM.Movie.Text.Split("\n\n");
 
-            movieVM.Movie.Subtitles = new List<Subtitle>();
-            foreach (var subtitle in MovieContentList)
-            {
-                if (subtitle.Trim() == "") continue;
-                string[] line = subtitle.Split("\r\n");
-                string[] time = line[1].Split(" ");
-                string txt = line[2] + ((line.Length > 3) ? " " + line[3] : "");
-
-                movieVM.Movie.Subtitles.Add(new pro_Models.Models.Subtitle
-                {
-                    Index = line[0],
-                    Text = txt,
-                    StartTime = TimeSpan.Parse(time[0].Replace(",", ".")).ToString(),
-                    EndtTime = TimeSpan.Parse(time[2].Replace(",", ".")).ToString(),
-                    Rank = await GetSubtitleRank(txt),
-                    Movie = movieVM.Movie,
-                    VocTests = await GetVocTests(txt, movieVM.Movie),
-                    VocSubtitles = await GetVocSubtitles(txt)
-                });
-            }
-       
             try
             {
-                var result = await appDbContext.Movies.AddAsync(movieVM.Movie);
-                await appDbContext.SaveChangesAsync();
+                movieVM.Movie.Subtitles = new List<Subtitle>();
+                foreach (var subtitle in MovieContentList)
+                {
+                    if (subtitle.Trim() == "") continue;
+                    string[] line = subtitle.Split("\n");
+                    string[] time = line[1].Split(" ");
+                    string txt = line[2] + ((line.Length > 3) ? " " + line[3] : "");
 
-                movieVM.Movie = result.Entity;
-                movieVM.Movie.Subtitles = null;
-                movieVM.Movie.Text = null;
+                    movieVM.Movie.Subtitles.Add(new pro_Models.Models.Subtitle
+                    {
+                        Index = line[0],
+                        Text = txt,
+                        StartTime = TimeSpan.Parse(time[0].Replace(",", ".")).ToString(),
+                        EndtTime = TimeSpan.Parse(time[2].Replace(",", ".")).ToString(),
+                        //Rank = await GetSubtitleRank(txt),
+                        Movie = movieVM.Movie,
+                        //VocTests = await GetVocTests(txt, movieVM.Movie),
+                        VocSubtitles = await GetVocSubtitles(txt)
+                    });
+                }
+       
+
+                    var result = await appDbContext.Movies.AddAsync(movieVM.Movie);
+                    await appDbContext.SaveChangesAsync();
+
+                    movieVM.Movie = result.Entity;
+                    movieVM.Movie.Subtitles = null;
+                    movieVM.Movie.Text = null;
             }
             catch (Exception ex)
             {
@@ -206,7 +205,7 @@ namespace pro_API.Repositories
 /// </summary>
         public async Task<pro_Models.Models.Movie> GetMovieByname(pro_Models.Models.Movie movie)
         {
-            return await appDbContext.Movies.Where(n => n.Name == movie.Name && n.Id != movie.Id)
+            return await appDbContext.Movies.Where(n => n.MovieId == movie.MovieId && n.Id != movie.Id)
                 .FirstOrDefaultAsync();
         }
     }

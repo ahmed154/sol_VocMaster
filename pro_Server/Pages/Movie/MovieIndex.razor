@@ -44,7 +44,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        MovieVMs =(await MovieService.GetMovies()).OrderByDescending(x => x.Movie.Id).ToList();
+        MovieVMs = await MovieService.GetMovies();
         if (MovieVMs.Count > 0 && !string.IsNullOrEmpty(MovieVMs[0].Exception))
         {
             await JSRuntime.Notfication(MovieVMs[0].Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);

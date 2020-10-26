@@ -1,0 +1,110 @@
+﻿<h3>Com_Videos</h3>
+
+@if (Voc.VocSubtitles != null && Voc.VocSubtitles.Count > 0)
+{
+        <p>@Voc.VocSubtitles.Count</p>
+
+
+        <iframe width="560" height="315"
+                src=@($"https://www.youtube.com/embed/{Voc.VocSubtitles[0].Subtitle.Movie.MovieId}?start={(int)TimeSpan.Parse(Voc.VocSubtitles[0].Subtitle.StartTime.ToString()).TotalSeconds}&autoplay=1")
+                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+        </iframe>
+
+        <div id="player"></div>
+
+        <button @onclick=@(()=>onYouTubeIframeAPIReady(startTime))>onYouTubeIframeAPIReady</button>
+        <button @onclick="onPlayerReady">onPlayerReady</button>
+        <button @onclick="onPlayerStateChange">onPlayerStateChange</button>
+        <button @onclick="stopVideo">stopVideo</button>
+        <button @onclick="playVideo">playVideo</button>
+        <button @onclick=@(()=> seekTo(startTime))>seekTo</button>
+        <button @onclick="getCurrentTime">getCurrentTime</button>
+        <button @onclick=@(()=>setId(Voc.VocSubtitles[0].Subtitle.Movie.MovieId, Voc.VocSubtitles[0].Subtitle.StartTime))>SetId</button>
+
+        <p>@Voc.VocSubtitles[0].Subtitle.Text</p>
+    }
+
+
+
+@code {
+
+    [Parameter] public Voc Voc { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+
+    public string currentMovieId { get; set; }
+    public int MyProperty { get; set; }
+
+    int startTime = 182;
+    int endTime = 187;
+
+    //?start=239={(int)TimeSpan.Parse(Voc.VocSubtitles[0].Subtitle.StartTime.ToString()).TotalSeconds} {Voc.VocSubtitles[0].Subtitle.Movie.MovieId}
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Voc = new Voc();
+        //Voc.VocSubtitles = new List<VocSubtitle> { new VocSubtitle { Subtitle = new Subtitle { Text = "damn they got a magnet plane hold on", StartTime = "182", EndtTime = "187" } } };
+
+        //await setId(Voc.VocSubtitles[0].Subtitle.Movie.MovieId, Voc.VocSubtitles[0].Subtitle.StartTime);
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        //if(Voc.VocSubtitles != null && Voc.VocSubtitles.Count > 0)
+        //{
+        //    await setId(Voc.VocSubtitles[0].Subtitle.Movie.MovieId, Voc.VocSubtitles[0].Subtitle.StartTime);
+        //}
+        //return base.OnParametersSetAsync();
+    }
+    public async Task RefreshMe(Voc voc)
+    {
+        Voc = voc;
+        StateHasChanged();
+    }
+
+    async Task onYouTubeIframeAPIReady(int start)
+    {
+        await JSRuntime.InvokeVoidAsync("onYouTubeIframeAPIReady", start);
+    }
+    async Task onYouTubeIframeAPIReady2()
+    {
+        await JSRuntime.InvokeVoidAsync("onYouTubeIframeAPIReady2");
+    }
+    async Task setId(string id, string startTime)
+    {
+        await JSRuntime.InvokeVoidAsync("setId", id, TimeSpan.Parse(startTime).TotalSeconds);
+    }
+    async Task onPlayerReady()
+    {
+        await JSRuntime.InvokeVoidAsync("onPlayerReady");
+    }
+    async Task onPlayerStateChange()
+    {
+        await JSRuntime.InvokeVoidAsync("onPlayerStateChange");
+    }
+    async Task stopVideo()
+    {
+        await JSRuntime.InvokeVoidAsync("stopVideo");
+    }
+    async Task playVideo()
+    {
+        await JSRuntime.InvokeVoidAsync("playVideo");
+    }
+    async Task seekTo(int start)
+    {
+
+        await JSRuntime.InvokeVoidAsync("seekTo", TimeSpan.Parse(Voc.VocSubtitles[0].Subtitle.StartTime).TotalSeconds);
+        await checkTime();
+    }
+    async Task<decimal> getCurrentTime()
+    {
+        return await JSRuntime.InvokeAsync<decimal>("getCurrentTime");
+    }
+    async Task checkTime()
+    {
+        while (await getCurrentTime() < endTime)
+        {
+            await Task.Delay(100);
+        }
+        await seekTo(startTime);
+    }
+
+}

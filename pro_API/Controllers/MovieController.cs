@@ -82,7 +82,7 @@ namespace pro_API.Controllers
                 Movie movie = await movieRepository.GetMovieByname(movieVM.Movie);
                 if (movie != null)
                 {
-                    ModelState.AddModelError("Name", $"Movie name: {movieVM.Movie.Name} already in use");
+                    ModelState.AddModelError("Name", $"Movie MovieId: {movieVM.Movie.MovieId} already in use");
                     return BadRequest(ModelState);
                 }
 
@@ -109,7 +109,7 @@ namespace pro_API.Controllers
                 Movie movie = await movieRepository.GetMovieByname(movieVM.Movie);
                 if (movie != null)
                 {
-                    ModelState.AddModelError("Name", $"Movie name: {movieVM.Movie.Name} already in use");
+                    ModelState.AddModelError("Name", $"Movie Movie Id: {movieVM.Movie.MovieId} already in use");
                     return BadRequest(ModelState);
                 }
 

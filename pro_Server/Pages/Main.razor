@@ -156,15 +156,15 @@
                                     <button @onclick=@(()=> bol_AddImage = !bol_AddImage) class="btn mr-5">Add Image</button>
                                     @if (bol_AddImage)
                                     {
-            <div class="row">
-                <a href=@($"https://pixabay.com/images/search/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">pixabay</a>
-                <a href=@($"https://unsplash.com/s/photos/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">unsplash</a>
-                <a href=@($"https://www.pexels.com/search/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">pexels</a>
-                <a href=@($"https://www.freeimages.com/search/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">freeimages</a>
-                <a href=@($"https://stocksnap.io/search/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">stocksnap</a>
-                <a href=@($"https://gratisography.com/?s={VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">gratisography</a>
-                <a href=@($"https://picjumbo.com/search/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">picjumbo</a>
-            </div>
+                                        <div class="row">
+                                            <a href=@($"https://pixabay.com/images/search/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">pixabay</a>
+                                            <a href=@($"https://unsplash.com/s/photos/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">unsplash</a>
+                                            <a href=@($"https://www.pexels.com/search/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">pexels</a>
+                                            <a href=@($"https://www.freeimages.com/search/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">freeimages</a>
+                                            <a href=@($"https://stocksnap.io/search/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">stocksnap</a>
+                                            <a href=@($"https://gratisography.com/?s={VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">gratisography</a>
+                                            <a href=@($"https://picjumbo.com/search/{VocMasterVM.Studys[0].Voc.Text}") target="_blank" class="ml-2">picjumbo</a>
+                                        </div>
 
                                         <div class="container bg-white border box-shadow p-3 rounded mt-2 mr-3">
                                             <EditForm Model="ImageVM" Context="formContext">
@@ -190,38 +190,44 @@
                                                     <a @onclick=@(() => bol_AddImage = false) class="btn border ml-1"><i class="fas fa-undo"></i> Cancel</a>
                                                 </div>
                                             </EditForm>
-                                        </div>}
+                                        </div>
+                                     }
                                 </div>
                                 <div class="row mt-3">
                                     @foreach (var image in VocMasterVM.Studys[0].Images)
                                     {
-            <div class="row ml-1 mt-1">
-                <div class="col s12 m6">
-                    <div class="card p-1">
-                        <div class="card-image">
-                            <img src=@image.Uri>
-                        </div>
-                        <div class="card-content mt-2">
-                            <button @onclick=@(()=> VocMasterVM.Studys[0].Images.Remove(image)) class="btn shadow-none float-right"><i class="far fa-trash-alt"></i></button>
-                            <p style="max-width:270px">@image.Comment</p>
-                        </div>
-                        <div class="card-action">
-                            @if (!image.Liked)
-                            {
-<button @onclick=@(()=>LikeImage(image)) class="btn shadow-none"><i class="far fa-thumbs-up"></i> @image.Like</button> }
-else
-{
-<button @onclick=@(()=>LikeImage(image)) class="btn shadow-none"><i class="fas fa-thumbs-up"></i> @image.Like</button>                            }
-                            @if (!image.Disliked)
-                            {
-<button @onclick=@(()=>DislikeImage(image)) class="btn shadow-none"><i class="far fa-thumbs-down"></i> @image.Dislike</button> }
-else
-{
-<button @onclick=@(()=>DislikeImage(image)) class="btn shadow-none"><i class="fas fa-thumbs-down"></i> @image.Dislike</button>                            }
-                        </div>
-                    </div>
-                </div>
-            </div>}
+                                        <div class="row ml-1 mt-1">
+                                            <div class="col s12 m6">
+                                                <div class="card p-1">
+                                                    <div class="card-image">
+                                                        <img src=@image.Uri>
+                                                    </div>
+                                                    <div class="card-content mt-2">
+                                                        <button @onclick=@(()=> VocMasterVM.Studys[0].Images.Remove(image)) class="btn shadow-none float-right"><i class="far fa-trash-alt"></i></button>
+                                                        <p style="max-width:270px">@image.Comment</p>
+                                                    </div>
+                                                    <div class="card-action">
+                                                        @if (!image.Liked)
+                                                        {
+                                                            <button @onclick=@(()=>LikeImage(image)) class="btn shadow-none"><i class="far fa-thumbs-up"></i> @image.Like</button> 
+                                                        }
+                                                        else
+                                                        {
+                                                            <button @onclick=@(()=>LikeImage(image)) class="btn shadow-none"><i class="fas fa-thumbs-up"></i> @image.Like</button>                            
+                                                        }
+                                                        @if (!image.Disliked)
+                                                        {
+                                                            <button @onclick=@(()=>DislikeImage(image)) class="btn shadow-none"><i class="far fa-thumbs-down"></i> @image.Dislike</button> 
+                                                        }
+                                                        else
+                                                        {
+                                                            <button @onclick=@(()=>DislikeImage(image)) class="btn shadow-none"><i class="fas fa-thumbs-down"></i> @image.Dislike</button>                            
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
                                 </div><hr />
                             </div>
 
@@ -251,7 +257,7 @@ else
                     {
                         <tr>
                             <td>
-                                @((subtitle.Movie.Name.Length >= 15)? subtitle.Movie.Name.Substring(0, 15) : subtitle.Movie.Name)
+                                @((subtitle.Movie.MovieId.Length >= 15)? subtitle.Movie.MovieId.Substring(0, 15) : subtitle.Movie.MovieId)
                             </td>
                             <td>
                                 @((MarkupString)subtitle.Text)
@@ -286,7 +292,7 @@ else
 
 else if (bol_Test && VocMasterVM.Tests.Count > 0)
 {
-<div class="container bg-white border box-shadow p-3 rounded">
+    <div class="container bg-white border box-shadow p-3 rounded">
 
     <div class="row mt-5 ml-3">
         <h4 style="font-size:40px;"><b>@VocMasterVM.Tests[0].Voc.Text</b></h4>
@@ -294,14 +300,14 @@ else if (bol_Test && VocMasterVM.Tests.Count > 0)
     <div class="row ml-3">
         @if (VocMasterVM.Tests[0].VocAudios.Count > 0)
         {
-<audio id="audio" src=@VocMasterVM.Tests[0].VocAudios[0].Uri autoplay></audio>
-                        <button @onclick=@PlaySound class="btn" style="border:none;"><i class="fas fa-volume-up"></i></button>
-                                                <span style="margin-top:7px;">@VocMasterVM.Tests[0].VocAudios[0].Phon</span> 
-                                                }
-                                                                    else
-                                                                    {
-                                                <span style="margin-top:33px;"></span>
-                                                }
+            <audio id="audio" src=@VocMasterVM.Tests[0].VocAudios[0].Uri autoplay></audio>
+            <button @onclick=@PlaySound class="btn" style="border:none;"><i class="fas fa-volume-up"></i></button>
+            <span style="margin-top:7px;">@VocMasterVM.Tests[0].VocAudios[0].Phon</span> 
+        }
+        else
+        {
+            <span style="margin-top:33px;"></span>
+        }
     </div>
 
     <div class="row mt-5 ml-3">
