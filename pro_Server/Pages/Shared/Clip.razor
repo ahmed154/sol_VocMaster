@@ -4,7 +4,7 @@
     Vid_On = Subtitle.Id;
     <a>
         <video style="width: 70px; height: 60px" autoplay loop>
-            <source src="@Subtitle.OnCloudClip" type="video/mp4">
+            @*<source src="@Subtitle.OnCloudClip" type="video/mp4">*@
             Your browser does not support playing this Video
         </video>
     </a>
@@ -15,7 +15,7 @@ else if (Clicked_Id == Subtitle.Id && Clicked_Id == Pre_Clicked_Id && Vid_On != 
     Vid_On = Subtitle.Id;
     <a>
         <video style="width: 70px; height: 60px" autoplay loop>
-            <source src="@Subtitle.OnCloudClip" type="video/mp4">
+            @*<source src="@Subtitle.OnCloudClip" type="video/mp4">*@
             Your browser does not support playing this Video
         </video>
     </a>
@@ -26,7 +26,7 @@ else if (Clicked_Id == Subtitle.Id && Clicked_Id == Pre_Clicked_Id && Vid_On == 
     Vid_On = 0;
     <a>
         <video style="width: 70px; height: 60px">
-            <source src="@(Subtitle.OnCloudClip)" type="video/mp4">
+            @*<source src="@(Subtitle.OnCloudClip)" type="video/mp4">*@
             Your browser does not support playing this Video
         </video>
     </a>
@@ -36,7 +36,7 @@ else
     Console.WriteLine(Vid_On);
     <a>
         <video style="width: 70px; height: 60px">
-            <source src="@Subtitle.OnCloudClip" type="video/mp4">
+            @*<source src="@Subtitle.OnCloudClip" type="video/mp4">*@
             Your browser does not support playing this Video
         </video>
     </a>

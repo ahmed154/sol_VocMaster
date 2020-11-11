@@ -8,19 +8,8 @@
     <div class="container border p-3">
         <div class="row">
             <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-                <InputFile class="btn btn-info form-control" multiple OnChange="AddNewMovie">Add Video</InputFile>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
                 <SfTextBox id="name" Placeholder="Video Id" Readonly="@bol_ReadOnly" FloatLabelType="@FloatLabelType.Auto" @bind-Value="@MovieVM.Movie.MovieId"></SfTextBox>
                 <ValidationMessage For="@(() => MovieVM.Movie.MovieId)" />
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-                <SfTextBox Placeholder="Video Name" Readonly="@bol_ReadOnly" FloatLabelType="@FloatLabelType.Auto" @bind-Value="@MovieVM.Movie.Name"></SfTextBox>
-                <ValidationMessage For="@(() => MovieVM.Movie.Name)" />
             </div>
         </div>
     </div>
@@ -64,30 +53,29 @@
 
     public async Task Submit(EditContext formContext)
     {
-        if (!formContext.Validate()) return;
-        await ecb_Save.InvokeAsync(MovieVM);
-    }
-
-    IFileListEntry[] SelectedFiles;
-    public async Task AddNewMovie(IFileListEntry[] files)
-    {
-        SelectedFiles = files;
-
-
-        if (SelectedFiles != null)
+        if((!string.IsNullOrEmpty(MovieVM.Movie.MovieId)) && MovieVM.Movie.MovieId.Length > 11)
         {
-            MovieVM.Movie.Name = SelectedFiles[0].Name;
-            MovieVM.Movie.Name = MovieVM.Movie.Name.Replace(" - English.srt", "");
-            MovieVM.Movie.Name = MovieVM.Movie.Name.Replace("[English]", "");
-            MovieVM.Movie.Name = MovieVM.Movie.Name.Replace(" [DownSub.com].srt", "");
-
-            using (var reader = new System.IO.StreamReader(SelectedFiles[0].Data))
+            if(MovieVM.Movie.MovieId.Contains("?v="))
             {
-                MovieVM.Movie.Text = await reader.ReadToEndAsync();
+                MovieVM.Movie.MovieId = MovieVM.Movie.MovieId.Substring(MovieVM.Movie.MovieId.IndexOf("?v=") + 3, 11);
             }
         }
-    }
+        using (WebClient client = new WebClient())
+        {
+            try
+            {
+                MovieVM.Movie.Text = client.DownloadString($"https://video.google.com/timedtext?lang=en&v={MovieVM.Movie.MovieId}");
+            }
+            catch (Exception ex)
+            {
 
+            }
+        }
+
+        if (!formContext.Validate()) return;
+
+        await ecb_Save.InvokeAsync(MovieVM);
+    }
 }
 
 <style>

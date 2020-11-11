@@ -234,15 +234,15 @@ namespace pro_API.Repositories
             try
             {
                 vocVM.Voc = await appDbContext.Vocs
-                .Include(x => x.VocAudios)
-                .Include(x => x.Definitions).ThenInclude(x => x.Examples)
-                .Include(x => x.Synonyms)
-                .Include(x => x.Translates)
+                //.Include(x => x.VocAudios)
+                //.Include(x => x.Definitions).ThenInclude(x => x.Examples)
+                //.Include(x => x.Synonyms)
+                //.Include(x => x.Translates)
                 .Include(x => x.Images)
                 .Include(x => x.VocSubtitles).ThenInclude(x => x.Subtitle).ThenInclude(x => x.Movie)
-                .Include(x => x.VocsQuotes).ThenInclude(x => x.Quote).ThenInclude(x => x.Influencer)
-                .Include(x => x.VocsIdioms).ThenInclude(x => x.Idiom)
-                .Include(x => x.VocsPhrases).ThenInclude(x => x.Phrase)
+                //.Include(x => x.VocsQuotes).ThenInclude(x => x.Quote).ThenInclude(x => x.Influencer)
+                //.Include(x => x.VocsIdioms).ThenInclude(x => x.Idiom)
+                //.Include(x => x.VocsPhrases).ThenInclude(x => x.Phrase)
                 .FirstOrDefaultAsync(x => x.Text == vocVM.Voc.Text);
             }
             catch (Exception ex)
@@ -257,20 +257,27 @@ namespace pro_API.Repositories
                 {
                     vocSubtitle.Voc = null;
                     vocSubtitle.Subtitle.VocSubtitles = null;
-                    vocSubtitle.Subtitle.Movie.Subtitles = null;
+                    //vocSubtitle.Subtitle.Movie.Subtitles = null;
+                    //vocSubtitle.Subtitle.Movie.Text = null;
+                    foreach (var subtitle in vocSubtitle.Subtitle.Movie.Subtitles)
+                    {
+                        subtitle.Movie = null;
+                        subtitle.VocSubtitles = null;
+                    }
+
                 }
                 foreach (var vocPhrase in vocVM.Voc.VocsPhrases ?? Enumerable.Empty<VocsPhrases>())
                 {
                     vocPhrase.Voc = null;
                     vocPhrase.Phrase.VocsPhrases = null;
                 }
-                foreach (var vocQuote in vocVM.Voc.VocsQuotes)
+                foreach (var vocQuote in vocVM.Voc.VocsQuotes ?? Enumerable.Empty<VocsQuotes>())
                 {
                     vocQuote.Voc = null;
                     vocQuote.Quote.VocsQuotes = null;
                     vocQuote.Quote.Influencer.Quotes = null;
                 }
-                foreach (var vocIdiom in vocVM.Voc.VocsIdioms)
+                foreach (var vocIdiom in vocVM.Voc.VocsIdioms ?? Enumerable.Empty<VocsIdioms>())
                 {
                     vocIdiom.Voc = null;
                     vocIdiom.Idiom.VocsIdioms = null;

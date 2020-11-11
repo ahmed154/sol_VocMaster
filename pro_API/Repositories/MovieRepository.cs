@@ -12,6 +12,7 @@ using pro_API.Migrations;
 using Movie = pro_Models.Models.Movie;
 using Subtitle = pro_Models.Models.Subtitle;
 using VocTest = pro_Models.Models.VocTest;
+using System.Xml;
 
 namespace pro_API.Repositories
 {
@@ -40,12 +41,17 @@ namespace pro_API.Repositories
             txt = txt.Replace("- ", " ");
             txt = txt.Replace("?", "");
             txt = txt.Replace("!", "");
-            txt = txt.Replace(", ", " ");
+            txt = txt.Replace(",", " ");
             txt = txt.Replace(".", "");
             txt = txt.Replace("<i>", "");
             txt = txt.Replace("</i>", "");
             txt = txt.Replace("-", "");
             txt = txt.Replace(" '", " ");
+            txt = txt.Replace("&#39;", "'");
+            txt = txt.Replace(":", " ");
+            txt = txt.Replace("(laughter)", "");
+            txt = txt.Replace("  ", " ");
+            txt = txt.Replace("  ", " ");
 
             return txt;
         }
@@ -124,49 +130,55 @@ namespace pro_API.Repositories
         }
         public async Task<MovieVM> CreateMovie(MovieVM movieVM)
         {
-            movieVM.Movie.Text = movieVM.Movie.Text.ToLower();
-            movieVM.Movie.Text = Reformat(movieVM.Movie.Text);
-
-            //string[] MovieContentList = movieVM.Movie.Text.Split("\r\n\r\n");
-            string[] MovieContentList = movieVM.Movie.Text.Split("\n\n");
-
+            string Text = "";
+            decimal start = -1; decimal end = 0;
+            string txt = "";
             try
             {
                 movieVM.Movie.Subtitles = new List<Subtitle>();
-                foreach (var subtitle in MovieContentList)
+
+                movieVM.Movie.Text = movieVM.Movie.Text.ToLower();
+                movieVM.Movie.Text = movieVM.Movie.Text.Replace("<?xml version=\"1.0\" encoding=\"utf-8\" ?>", "");
+
+                XmlDocument xml = new XmlDocument();
+                xml.LoadXml(movieVM.Movie.Text);
+
+                XmlNodeList xnList = xml.SelectNodes("/transcript/text");
+                foreach (XmlNode xn in xnList)
                 {
-                    if (subtitle.Trim() == "") continue;
-                    string[] line = subtitle.Split("\n");
-                    string[] time = line[1].Split(" ");
-                    string txt = line[2] + ((line.Length > 3) ? " " + line[3] : "");
+                    if (string.IsNullOrEmpty(xn.InnerText) || xn.Attributes["start"] == null || xn.Attributes["dur"] == null) continue;
+
+                    xn.InnerText = Reformat(xn.InnerText);
+
+                    if (txt == "") start = Convert.ToDecimal(xn.Attributes["start"].Value);
+                    if (txt != "") txt += " ";
+                    txt += xn.InnerText;
+
+                    if (txt.Length < 99) continue;
+
+                    end = Convert.ToDecimal(xn.Attributes["start"].Value) + Convert.ToDecimal(xn.Attributes["dur"].Value);
 
                     movieVM.Movie.Subtitles.Add(new pro_Models.Models.Subtitle
                     {
-                        Index = line[0],
                         Text = txt,
-                        StartTime = TimeSpan.Parse(time[0].Replace(",", ".")).ToString(),
-                        EndtTime = TimeSpan.Parse(time[2].Replace(",", ".")).ToString(),
-                        //Rank = await GetSubtitleRank(txt),
-                        Movie = movieVM.Movie,
-                        //VocTests = await GetVocTests(txt, movieVM.Movie),
+                        StartTime = start,
+                        EndtTime = end,
                         VocSubtitles = await GetVocSubtitles(txt)
                     });
+                    txt = "";
                 }
-       
 
-                    var result = await appDbContext.Movies.AddAsync(movieVM.Movie);
-                    await appDbContext.SaveChangesAsync();
+                var result = await appDbContext.Movies.AddAsync(movieVM.Movie);
+                        await appDbContext.SaveChangesAsync();
 
-                    movieVM.Movie = result.Entity;
-                    movieVM.Movie.Subtitles = null;
-                    movieVM.Movie.Text = null;
+                        movieVM.Movie = result.Entity;
+                        movieVM.Movie.Subtitles = null;
+                        movieVM.Movie.Text = null;
             }
             catch (Exception ex)
             {
 
             }
-
-
 
             return movieVM;
         }
@@ -203,7 +215,7 @@ namespace pro_API.Repositories
 /// <summary>
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// </summary>
-        public async Task<pro_Models.Models.Movie> GetMovieByname(pro_Models.Models.Movie movie)
+        public async Task<pro_Models.Models.Movie> GetMovieById(pro_Models.Models.Movie movie)
         {
             return await appDbContext.Movies.Where(n => n.MovieId == movie.MovieId && n.Id != movie.Id)
                 .FirstOrDefaultAsync();

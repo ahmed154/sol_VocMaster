@@ -6,127 +6,69 @@ function FocusElement(id) {
     document.getElementById(id).focus();
 } 
 
-var MovieId;
-var StartTime;
-// 2. This code loads the IFrame Player API code asynchronously.
-var tag = document.createElement('script');
 
-tag.src = "https://www.youtube.com/iframe_api";
-var firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-// 3. This function creates an <iframe> (and YouTube player)
-//    after the API code downloads.
+    var tag = document.createElement('script');
+    tag.id = 'iframe-demo';
+    tag.src = 'https://www.youtube.com/iframe_api';
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
 var player;
-function onYouTubeIframeAPIReady(startTime) {
-    player = new YT.Player('player', {
-        height: '390',
-        width: '640',
-        videoId: '_hrguJlsZ90',
-        playerVars: { start: startTime, controls:0, fs:0},
-        events: {
-            //'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-        }
-    });
-}
-function onYouTubeIframeAPIReady2() {
-    player = new YT.Player('player', {
-        height: '390',
-        width: '640',
-        playerVars: {controls: 0, fs: 0 },
-        events: {
-            //'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-        }
-    });
-}
-
-function setId(id, startTime) {
-
-    StartTime = startTime;
-    player = null;
-    player = new YT.Player('player', {
-        height: '390',
-        width: '640',
-        videoId: id,
-        playerVars: { start: startTime },
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-        }
-    });
-}
-
-// 4. The API will call this function when the video player is ready.
-function onPlayerReady(event) {
-    event.target.playVideo();
-    seekTo(StartTime);
-}
-
-// 5. The API calls this function when the player's state changes.
-//    The function indicates that when playing a video (state=1),
-//    the player should play for six seconds and then stop.
-var done = false;
-var replay
-function onPlayerStateChange(event)
-{
-
-    //    if (event !== null)
-    //    {
-    //        if (event.data !== null)
-    //        {
-    //            if (event.data == 1)
-    //            {
-    //                replay = setInterval(function ()
-    //                {
-    //                    console.log("playing ...");
-    //                    if (player.getCurrentTime() >= 182 && player.getCurrentTime() < 187) {
-    //                    }
-    //                    else {
-    //                        console.log("seek");
-    //                        player.seekTo(182, true);
-    //                    }
-    //                }, 500);  
-    //            }
-    //            else {
-    //                clearInterval(replay);
-    //                player.playVideo();
-    //            }
-    //        }
-    //        else {
-    //            clearInterval(replay);
-    //        }
-    //    }
-        
-    //    else
-    //    {
-    //        clearInterval(replay);
-    //    }
-      
-
-    //if (event.data == YT.PlayerState.PLAYING && !done) {
-    //    setTimeout(stopVideo, 6000);
-    //    done = true;
-    //}
+var tim;
+  function onYouTubeIframeAPIReady() {
+        player = new YT.Player('existing-iframe-example', {
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        });
+  }
+  function onPlayerReady(event) {
+        document.getElementById('existing-iframe-example').style.borderColor = '#FF6D00';
 }
 
 
-function playVideo() {
-    player.playVideo();
+function changeBorderColor(playerStatus) {
+
+    var color;
+      if (playerStatus == -1) {
+        color = "#37474F"; // unstarted = gray
+    } else if (playerStatus == 0) {
+        color = "#FFFF00"; // ended = yellow
+    } else if (playerStatus == 1) {
+        color = "#33691E"; // playing = green
+    } else if (playerStatus == 2) {
+        color = "#DD2C00"; // paused = red
+    } else if (playerStatus == 3) {
+        color = "#AA00FF"; // buffering = purple
+    } else if (playerStatus == 5) {
+          color = "#FF6DOO"; // video cued = orange
+    }
+    if (color) {
+        document.getElementById('existing-iframe-example').style.borderColor = color;
+    }
+  }
+  function onPlayerStateChange(event) {
+        changeBorderColor(event.data);
+  }
+
+function seek(tim) {
+    player.seekTo(tim, true);
 }
 function stopVideo() {
     player.stopVideo();
 }
-function seekTo(t) {
-    if (YT.PlayerState.PLAYING) {
-        player.seekTo(t, true);
-    }
+
+function playVideo(){
+    player.playVideo();
 }
 function getCurrentTime() {
-     return player.getCurrentTime();
+    if (player.getCurrentTime != null) {
+        return player.getCurrentTime();
+    }
+    else {
+        return 0;
+    }
 }
-
-
-
-
+  

@@ -79,10 +79,10 @@ namespace pro_API.Controllers
                 if (movieVM == null)return BadRequest();
 
                 // Add custom model validation error
-                Movie movie = await movieRepository.GetMovieByname(movieVM.Movie);
+                Movie movie = await movieRepository.GetMovieById(movieVM.Movie);
                 if (movie != null)
                 {
-                    ModelState.AddModelError("Name", $"Movie MovieId: {movieVM.Movie.MovieId} already in use");
+                    ModelState.AddModelError("Video Id", $"Video Id: {movieVM.Movie.MovieId} already in use");
                     return BadRequest(ModelState);
                 }
 
@@ -106,10 +106,10 @@ namespace pro_API.Controllers
                     return BadRequest("Movie ID mismatch");
 
                 // Add custom model validation error
-                Movie movie = await movieRepository.GetMovieByname(movieVM.Movie);
+                Movie movie = await movieRepository.GetMovieById(movieVM.Movie);
                 if (movie != null)
                 {
-                    ModelState.AddModelError("Name", $"Movie Movie Id: {movieVM.Movie.MovieId} already in use");
+                    ModelState.AddModelError("Video Id", $"Video Id: {movieVM.Movie.MovieId} already in use");
                     return BadRequest(ModelState);
                 }
 

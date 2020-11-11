@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using pro_API.Data;
 
 namespace pro_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201026121229_Images-UserId-Approved")]
+    partial class ImagesUserIdApproved
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -377,6 +379,10 @@ namespace pro_API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -452,8 +458,16 @@ namespace pro_API.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("EndtTime")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("ClipUri")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EndtTime")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Index")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MovieId")
                         .HasColumnType("int");
@@ -461,8 +475,9 @@ namespace pro_API.Migrations
                     b.Property<int>("Rank")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("StartTime")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("StartTime")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -956,7 +971,7 @@ namespace pro_API.Migrations
                         .IsRequired();
 
                     b.HasOne("pro_Models.Models.Subtitle", "Subtitle")
-                        .WithMany()
+                        .WithMany("VocTests")
                         .HasForeignKey("SubtitleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

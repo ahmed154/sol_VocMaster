@@ -51,7 +51,7 @@
 }
 else if (bol_Images)
 {
-    <Com_Images Voc="VocVM.Voc" />
+    <Com_Images Voc="VocVM.Voc"/>
 }
 else if (bol_Videos)
 {
@@ -113,8 +113,13 @@ else if (bol_Phrases)
         bol_Idioms = (tap == "Idioms") ? true : false;
         bol_Phrases = (tap == "Phrases") ? true : false;
     }
+
     async Task OptimizeVoc()
     {
+        foreach (VocSubtitle vocSubtitle in VocVM.Voc.VocSubtitles ?? Enumerable.Empty<VocSubtitle>())
+        {
+            if(vocSubtitle.Subtitle.Movie.Subtitles == null) vocSubtitle.Subtitle.Movie.Subtitles = await Utility.ProduceSubtitlesFromText(vocSubtitle.Subtitle.Movie.MovieId);
+        }
         foreach (var vocPhrase in VocVM.Voc.VocsPhrases ?? Enumerable.Empty<VocsPhrases>())
         {
             vocPhrase.Phrase.Text = vocPhrase.Phrase.Text.Replace(VocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text}</mark>");
@@ -149,7 +154,7 @@ else if (bol_Phrases)
         else
         {
             VocVM.Exception = null;
-            VocVM = await VocMasterService.GetVocVMByText(VocVM);
+            VocVM = await VocMasterService.GetVocVMByText(new VocVM { Voc = new Voc { Text = VocVM.Voc.Text} });
             if (!string.IsNullOrEmpty(VocVM.Exception))
             {
                 await JSRuntime.Notfication(VocVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);

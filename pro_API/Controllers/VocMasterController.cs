@@ -68,7 +68,8 @@ namespace pro_API.Controllers
             {
                 if (vocVM == null) return BadRequest();
 
-                return await vocMasterRepository.GetVocVMByText(vocVM);
+                vocVM = await vocMasterRepository.GetVocVMByText(vocVM);
+                return vocVM;
             }
             catch (DbUpdateException Ex)
             {

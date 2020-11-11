@@ -16,6 +16,6 @@ namespace pro_API.Repositories
         
         /////////////////////////////////////////////////////////// Other interface methods
         //Task<Movie> GetMovieByName(string name);
-        Task<Movie> GetMovieByname(Movie movie);
+        Task<Movie> GetMovieById(Movie movie);
     }
 }

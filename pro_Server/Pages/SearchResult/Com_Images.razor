@@ -1,151 +1,174 @@
-﻿
-<button @onclick=@(()=> bol_AddImage = !bol_AddImage) class="btn mr-5">Add Image</button>
+﻿<div style="margin-left:193px; margin-top:50px;">
 
-@if (bol_AddImage)
-{
-    <div class="row ml-3">
-        <a href=@($"https://www.google.com/search?safe=strict&hl=en&tbm=isch&source=hp&biw=1600&bih=757&q={Voc.Text}&oq={Voc.Text}&sclient=img") target="_blank" class="ml-2">google</a>
-        <a href=@($"https://pixabay.com/images/search/{Voc.Text}") target="_blank" class="ml-2">pixabay</a>
-        <a href=@($"https://unsplash.com/s/photos/{Voc.Text}") target="_blank" class="ml-2">unsplash</a>
-        <a href=@($"https://www.pexels.com/search/{Voc.Text}") target="_blank" class="ml-2">pexels</a>
-        <a href=@($"https://www.freeimages.com/search/{Voc.Text}") target="_blank" class="ml-2">freeimages</a>
-        <a href=@($"https://stocksnap.io/search/{Voc.Text}") target="_blank" class="ml-2">stocksnap</a>
-        <a href=@($"https://gratisography.com/?s={Voc.Text}") target="_blank" class="ml-2">gratisography</a>
-        <a href=@($"https://picjumbo.com/search/{Voc.Text}") target="_blank" class="ml-2">picjumbo</a>
+    <div class="row float-right">
+        <button @onclick=@(()=> bol_AddImage = !bol_AddImage) class="btn mr-5">Add Image</button>
     </div>
-    <div class="row ml-3">
-        <EditForm Model="ImageVM" Context="formContext">
-            <ObjectGraphDataAnnotationsValidator />
 
-            <div class="container border p-3">
-                <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-                        <SfTextBox Placeholder="URI" @bind-Value="@ImageVM.Image.Uri"></SfTextBox>
-                        <ValidationMessage For="@(() => ImageVM.Image.Uri)" />
-                    </div>
-                </div>
-                <div class="row mt-1">
-                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-                        <SfTextBox Placeholder="Comment" @bind-Value="@ImageVM.Image.Comment"></SfTextBox>
-                        <ValidationMessage For="@(() => ImageVM.Image.Comment)" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="row pt-4">
-                <button @onclick=@(() => SaveImage(formContext)) class="btn btn-primary ml-3" type="submit" style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
-                <a @onclick=@(() => bol_AddImage = false) class="btn border ml-1"><i class="fas fa-undo"></i> Cancel</a>
-            </div>
-        </EditForm>
-    </div>
-}
-
-@if (Voc.Images != null && Voc.Images.Count > 0)
-{
-    @foreach (var image in Voc.Images)
+    @if (bol_AddImage)
     {
-        <div class="row ml-1 mt-1">
-            <div class="col s12 m6">
-                <div class="card p-1">
-                    <div class="card-image">
-                        <img src=@image.Uri>
+        <div class="row ml-3">
+            <a href=@($"https://www.google.com/search?safe=strict&hl=en&tbm=isch&source=hp&biw=1600&bih=757&q={Voc.Text}&oq={Voc.Text}&sclient=img") target="_blank" class="ml-2">google</a>
+            <a href=@($"https://pixabay.com/images/search/{Voc.Text}") target="_blank" class="ml-2">pixabay</a>
+            <a href=@($"https://unsplash.com/s/photos/{Voc.Text}") target="_blank" class="ml-2">unsplash</a>
+            <a href=@($"https://www.pexels.com/search/{Voc.Text}") target="_blank" class="ml-2">pexels</a>
+            <a href=@($"https://www.freeimages.com/search/{Voc.Text}") target="_blank" class="ml-2">freeimages</a>
+            <a href=@($"https://stocksnap.io/search/{Voc.Text}") target="_blank" class="ml-2">stocksnap</a>
+            <a href=@($"https://gratisography.com/?s={Voc.Text}") target="_blank" class="ml-2">gratisography</a>
+            <a href=@($"https://picjumbo.com/search/{Voc.Text}") target="_blank" class="ml-2">picjumbo</a>
+        </div>
+        <div class="row ml-3">
+            <EditForm Model="ImageVM" Context="formContext">
+                <ObjectGraphDataAnnotationsValidator />
+
+                <div class="container border p-3">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                            <SfTextBox Placeholder="URI" @bind-Value="@ImageVM.Image.Uri"></SfTextBox>
+                            <ValidationMessage For="@(() => ImageVM.Image.Uri)" />
+                        </div>
                     </div>
-                    <div class="card-content mt-2">
-                        <button @onclick=@(()=> Voc.Images.Remove(image)) class="btn shadow-none float-right"><i class="far fa-trash-alt"></i></button>
-                        <p style="max-width:270px">@image.Comment</p>
-                    </div>
-                    <div class="card-action">
-                        @if (!image.Liked)
-                        {
-                            <button @onclick=@(()=>LikeImage(image)) class="btn shadow-none"><i class="far fa-thumbs-up"></i> @image.Like</button>
-                        }
-                        else
-                        {
-                            <button @onclick=@(()=>LikeImage(image)) class="btn shadow-none"><i class="fas fa-thumbs-up"></i> @image.Like</button>
-                        }
-                        @if (!image.Disliked)
-                        {
-                            <button @onclick=@(()=>DislikeImage(image)) class="btn shadow-none"><i class="far fa-thumbs-down"></i> @image.Dislike</button>
-                        }
-                        else
-                        {
-                            <button @onclick=@(()=>DislikeImage(image)) class="btn shadow-none"><i class="fas fa-thumbs-down"></i> @image.Dislike</button>
-                        }
+                    <div class="row mt-1">
+                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                            <SfTextBox Placeholder="Comment" @bind-Value="@ImageVM.Image.Comment"></SfTextBox>
+                            <ValidationMessage For="@(() => ImageVM.Image.Comment)" />
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <div class="row pt-4">
+                    <button @onclick=@(() => SaveImage(formContext)) class="btn btn-primary ml-3" type="submit" style="background-color:#6372C4"><i class="far fa-save"></i> Save</button>
+                    <a @onclick=@(() => bol_AddImage = false) class="btn border ml-1"><i class="fas fa-undo"></i> Cancel</a>
+                </div>
+            </EditForm>
         </div>
     }
-}
 
-
-
-@code {
-
-    [Parameter] public Voc Voc { get; set; }
-    [Inject] public IJSRuntime JSRuntime { get; set; }
-    [Inject] public IImageService ImageService { get; set; }
-
-    public pro_Models.ViewModels.ImageVM ImageVM { get; set; } = new pro_Models.ViewModels.ImageVM();
-    public bool bol_AddImage { get; set; }
-
-    protected override async Task OnInitializedAsync()
+    @if (Voc.Images == null)
     {
+        <span>Loading...</span>
+    }
+    else if (Voc.Images.Count == 0)
+    {
+        <span>There's no images for this vocabulary.</span>
+    }
+    else if (Voc.Images.Count > 0)
+    {       
+       @foreach (var image in Voc.Images)
+            {
+                <div class="row ml-1 mt-1">
+                    <div class="col s12 m6">
+                        <div class="card p-1">
+                            <div class="card-image">
+                                <img src=@image.Uri>
+                            </div>
+                            <div class="card-content mt-2">
+                                <button @onclick=@(()=> Voc.Images.Remove(image)) class="btn shadow-none float-right"><i class="far fa-trash-alt"></i></button>
+                                <p style="max-width:270px">@image.Comment</p>
+                            </div>
+                            <div class="card-action">
+                                @if (!image.Liked)
+                                {
+                                    <button @onclick=@(()=>LikeImage(image)) class="btn shadow-none"><i class="far fa-thumbs-up"></i> @image.Like</button>
+                                }
+                                else
+                                {
+                                    <button @onclick=@(()=>LikeImage(image)) class="btn shadow-none"><i class="fas fa-thumbs-up"></i> @image.Like</button>
+                                }
+                                @if (!image.Disliked)
+                                {
+                                    <button @onclick=@(()=>DislikeImage(image)) class="btn shadow-none"><i class="far fa-thumbs-down"></i> @image.Dislike</button>
+                                }
+                                else
+                                {
+                                    <button @onclick=@(()=>DislikeImage(image)) class="btn shadow-none"><i class="fas fa-thumbs-down"></i> @image.Dislike</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+    }
+    </div>
+
+
+    @code {
+
+        [Parameter] public Voc Voc { get; set; }
+        [Parameter] public string UserName { get; set; }
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; }
+
+        [Inject] public IImageService ImageService { get; set; }
+
+
+        public pro_Models.ViewModels.ImageVM ImageVM { get; set; } = new pro_Models.ViewModels.ImageVM();
+        public bool bol_AddImage { get; set; }
+
+        protected override async Task OnInitializedAsync()
+        {
+            if (string.IsNullOrEmpty(UserName)) UserName = await JSRuntime.GetFromLocalStorage("Email");
+
+        }
+        public async Task RefreshMe(Voc voc)
+        {
+            Voc = voc;
+            StateHasChanged();
+        }
+        public async Task AddImage()
+        {
+            if (string.IsNullOrEmpty(UserName))
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+        }
+        public async Task SaveImage(EditContext formContext)
+        {
+            if (!formContext.Validate()) return;
+            ImageVM.Exception = null;
+            ImageVM.Image.VocId = Voc.Id;
+            ImageVM.UserName = UserName;
+            ImageVM createdImageVM = await ImageService.CreateImage(ImageVM);
+
+            if (string.IsNullOrEmpty(createdImageVM.Exception))
+            {
+                await JSRuntime.Notfication($"Image {ImageVM.Image.Comment} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
+
+                //VocMasterVM.Studys[0].Images.Add(new pro_Models.Models.Image { Uri = ImageVM.Image.Uri, Comment = ImageVM.Image.Comment });
+                ImageVM = new ImageVM();
+            }
+            else
+            {
+                await JSRuntime.Notfication(createdImageVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            }
+
+            bol_AddImage = false;
+        }
+
+        public async Task LikeImage(pro_Models.Models.Image image)
+        {
+            if (image.Liked)
+            {
+                image.Like--; image.Liked = false;
+            }
+            else
+            {
+                if (image.Disliked) image.Dislike--; image.Disliked = false;
+                image.Like++;
+                image.Liked = true;
+            }
+        }
+        public async Task DislikeImage(pro_Models.Models.Image image)
+        {
+            if (image.Disliked)
+            {
+                image.Dislike--; image.Disliked = false;
+            }
+            else
+            {
+                if (image.Liked) image.Like--; image.Liked = false;
+                image.Dislike++;
+                image.Disliked = true;
+            }
+        }
 
     }
-    public async Task RefreshMe(Voc voc)
-    {
-        Voc = voc;
-        StateHasChanged();
-    }
-
-    public async Task SaveImage(EditContext formContext)
-    {
-        if (!formContext.Validate()) return;
-        ImageVM.Exception = null;
-        ImageVM.Image.VocId = Voc.Id;
-        ImageVM createdImageVM = await ImageService.CreateImage(ImageVM);
-
-        if (string.IsNullOrEmpty(createdImageVM.Exception))
-        {
-            await JSRuntime.Notfication($"Image {ImageVM.Image.Comment} has been created successfully!", IJSRuntimeExtensionMethods.SweetAlertMessageType.success, 3000);
-
-            //VocMasterVM.Studys[0].Images.Add(new pro_Models.Models.Image { Uri = ImageVM.Image.Uri, Comment = ImageVM.Image.Comment });
-            ImageVM = new ImageVM();
-        }
-        else
-        {
-            await JSRuntime.Notfication(createdImageVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
-        }
-
-        bol_AddImage = false;
-    }
-
-    public async Task LikeImage(pro_Models.Models.Image image)
-    {
-        if (image.Liked)
-        {
-            image.Like--; image.Liked = false;
-        }
-        else
-        {
-            if (image.Disliked) image.Dislike--; image.Disliked = false;
-            image.Like++;
-            image.Liked = true;
-        }
-    }
-    public async Task DislikeImage(pro_Models.Models.Image image)
-    {
-        if (image.Disliked)
-        {
-            image.Dislike--; image.Disliked = false;
-        }
-        else
-        {
-            if (image.Liked) image.Like--; image.Liked = false;
-            image.Dislike++;
-            image.Disliked = true;
-        }
-    }
-
-}
