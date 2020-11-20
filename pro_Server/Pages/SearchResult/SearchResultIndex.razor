@@ -45,140 +45,182 @@
     </div>
 </div>
 
-@if (bol_Dictionary)
-{
-    <Com_DictionaryApiDev Voc="VocVM.Voc" @ref="com_Dic" />
-}
-else if (bol_Images)
-{
-    <Com_Images Voc="VocVM.Voc"/>
-}
-else if (bol_Videos)
-{
-    <Com_Videos Voc="VocVM.Voc" @ref="com_Videos"/>
-}
-else if (bol_Quotes)
-{
-    <Com_Quotes Voc="VocVM.Voc" />
-}
-else if (bol_Idioms)
-{
-    <Com_Idioms Voc="VocVM.Voc" />
-}
-else if (bol_Phrases)
-{
-    <Phrases Voc="VocVM.Voc" />
-}
 
-@code {
-
-    [Parameter] public string txt { get; set; }
-    [Inject] public IVocMasterService VocMasterService { get; set; }
-    [Inject] public IJSRuntime JSRuntime { get; set; }
-
-
-    public VocVM VocVM { get; set; } = new VocVM();
-
-    public bool bol_Dictionary { get; set; } = true;
-    public bool bol_Images { get; set; }
-    public bool bol_Videos { get; set; }
-    public bool bol_Quotes { get; set; }
-    public bool bol_Idioms { get; set; }
-    public bool bol_Phrases { get; set; }
-
-    protected Com_DictionaryApiDev com_Dic;
-    protected Com_Videos com_Videos;
-
-
-    protected override async Task OnInitializedAsync()
+<div style="margin-left:193px; margin-top:50px;">
+    @if (bol_Dictionary)
     {
-        VocVM.Voc.Text = txt;
-        VocVM.Exception = null;
-        VocVM = await VocMasterService.GetVocVMByText(VocVM);
-        if (!string.IsNullOrEmpty(VocVM.Exception))
-        {
-            await JSRuntime.Notfication(VocVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
-            return;
-        }
-        await OptimizeVoc();
+        <Com_DictionaryApiDev Voc="VocVM.Voc" @ref="com_Dic" />
     }
-
-    #region Pro
-    void CloseTabs(string tap)
+    else if (bol_Images)
     {
-        bol_Dictionary = (tap == "Dictionary") ? true : false;
-        bol_Images = (tap == "Images") ? true : false;
-        bol_Videos = (tap == "Videos") ? true : false;
-        bol_Quotes = (tap == "Quotes") ? true : false;
-        bol_Idioms = (tap == "Idioms") ? true : false;
-        bol_Phrases = (tap == "Phrases") ? true : false;
-    }
-
-    async Task OptimizeVoc()
-    {
-        foreach (VocSubtitle vocSubtitle in VocVM.Voc.VocSubtitles ?? Enumerable.Empty<VocSubtitle>())
+        if (SearchResultVM.Images == null)
         {
-            if(vocSubtitle.Subtitle.Movie.Subtitles == null) vocSubtitle.Subtitle.Movie.Subtitles = await Utility.ProduceSubtitlesFromText(vocSubtitle.Subtitle.Movie.MovieId);
-        }
-        foreach (var vocPhrase in VocVM.Voc.VocsPhrases ?? Enumerable.Empty<VocsPhrases>())
-        {
-            vocPhrase.Phrase.Text = vocPhrase.Phrase.Text.Replace(VocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text}</mark>");
-            vocPhrase.Phrase.Text = vocPhrase.Phrase.Text.Replace(VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1),
-                $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1)}</mark>");
-        }
-
-        if(VocVM.Voc.VocsQuotes != null) VocVM.Voc.VocsQuotes = VocVM.Voc.VocsQuotes.OrderBy(x => x.Quote.Text.Length).ToList();
-        foreach (var vocQuote in VocVM.Voc.VocsQuotes ?? Enumerable.Empty<VocsQuotes>())
-        {
-            vocQuote.Quote.Text = vocQuote.Quote.Text.Replace(VocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text}</mark>");
-            vocQuote.Quote.Text = vocQuote.Quote.Text.Replace(VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1),
-            $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1)}</mark>");
-        }
-
-        if (VocVM.Voc.VocsIdioms != null) VocVM.Voc.VocsIdioms = VocVM.Voc.VocsIdioms.OrderBy(x => x.Idiom.Text.Length).ToList();
-        foreach (var vocIdiom in VocVM.Voc.VocsIdioms ?? Enumerable.Empty<VocsIdioms>())
-        {
-            vocIdiom.Idiom.Text = vocIdiom.Idiom.Text.Replace(VocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text}</mark>");
-            vocIdiom.Idiom.Text = vocIdiom.Idiom.Text.Replace(VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1),
-            $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1)}</mark>");
-        }
-    }
-    #endregion
-
-    async Task Search()
-    {
-        if (string.IsNullOrEmpty(VocVM.Voc.Text.Trim()))
-        {
-
+            <span>Loading...</span>
         }
         else
         {
+            <Com_Images SearchResultVM="SearchResultVM" />
+        }
+    }
+    else if (bol_Videos)
+    {
+        if (SearchResultVM.Vids == null)
+        {
+            <span>Loading...</span>
+        }
+        else if (SearchResultVM.Vids.Count == 0)
+        {
+            <span>There's no videos for this vocabulary.</span>
+        }
+        else
+        {
+            <Com_Videos SearchResultVM="SearchResultVM" @ref="com_Videos" />
+        }
+    }
+    else if (bol_Quotes)
+    {
+        <Com_Quotes Voc="VocVM.Voc" />
+    }
+    else if (bol_Idioms)
+    {
+        <Com_Idioms Voc="VocVM.Voc" />
+    }
+    else if (bol_Phrases)
+    {
+        <Phrases Voc="VocVM.Voc" />
+    }
+</div>
+
+    @code {
+
+        [Parameter] public string txt { get; set; }
+        [Inject] public IVocMasterService VocMasterService { get; set; }
+        [Inject] public ISearchResultService SearchResultService { get; set; }
+        [Inject] public IVocService VocService { get; set; }
+
+
+        [Inject] public IJSRuntime JSRuntime { get; set; }
+
+
+        public VocVM VocVM { get; set; } = new VocVM();
+        public SearchResultVM SearchResultVM { get; set; } = new SearchResultVM();
+
+        public bool bol_Dictionary { get; set; } = true;
+        public bool bol_Images { get; set; }
+        public bool bol_Videos { get; set; }
+        public bool bol_Quotes { get; set; }
+        public bool bol_Idioms { get; set; }
+        public bool bol_Phrases { get; set; }
+
+        protected Com_DictionaryApiDev com_Dic;
+        protected Com_Videos com_Videos;
+
+
+        protected override async Task OnInitializedAsync()
+        {
+            VocVM.Voc.Text = txt;
             VocVM.Exception = null;
-            VocVM = await VocMasterService.GetVocVMByText(new VocVM { Voc = new Voc { Text = VocVM.Voc.Text} });
-            if (!string.IsNullOrEmpty(VocVM.Exception))
+
+            //SearchResultVM.Voc = VocVM.Voc;
+            //SearchResultVM.Vids = await SearchResultService.GetVids(VocVM);
+
+            //VocVM.Voc.Images = await VocMasterService.GetImagesByText(VocVM);
+            //VocVM.Voc.VocSubtitles = await VocMasterService.GetVocSubtitlesByText(VocVM);
+
+            //VocVM = await VocMasterService.GetVocVMByText(VocVM);
+            //if (!string.IsNullOrEmpty(VocVM.Exception))
+            //{
+            //    await JSRuntime.Notfication(VocVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+            //    return;
+            //}
+            //await OptimizeVoc();
+
+            await Search();
+        }
+
+        #region Pro
+        void CloseTabs(string tap)
+        {
+            bol_Dictionary = (tap == "Dictionary") ? true : false;
+            bol_Images = (tap == "Images") ? true : false;
+            bol_Videos = (tap == "Videos") ? true : false;
+            bol_Quotes = (tap == "Quotes") ? true : false;
+            bol_Idioms = (tap == "Idioms") ? true : false;
+            bol_Phrases = (tap == "Phrases") ? true : false;
+        }
+
+        async Task OptimizeVoc()
+        {
+            foreach (VocSubtitle vocSubtitle in VocVM.Voc.VocSubtitles ?? Enumerable.Empty<VocSubtitle>())
             {
-                await JSRuntime.Notfication(VocVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
-                return;
+                if (vocSubtitle.Subtitle.Movie.Subtitles == null) vocSubtitle.Subtitle.Movie.Subtitles = await Utility.ProduceSubtitlesFromText(vocSubtitle.Subtitle.Movie.MovieId);
             }
-            await com_Dic.RefreshMe(VocVM.Voc.Text);
-            if(com_Videos != null) await com_Videos.RefreshMe(VocVM.Voc);
-            await OptimizeVoc();
+            foreach (var vocPhrase in VocVM.Voc.VocsPhrases ?? Enumerable.Empty<VocsPhrases>())
+            {
+                vocPhrase.Phrase.Text = vocPhrase.Phrase.Text.Replace(VocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text}</mark>");
+                vocPhrase.Phrase.Text = vocPhrase.Phrase.Text.Replace(VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1),
+                    $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1)}</mark>");
+            }
+
+            if (VocVM.Voc.VocsQuotes != null) VocVM.Voc.VocsQuotes = VocVM.Voc.VocsQuotes.OrderBy(x => x.Quote.Text.Length).ToList();
+            foreach (var vocQuote in VocVM.Voc.VocsQuotes ?? Enumerable.Empty<VocsQuotes>())
+            {
+                vocQuote.Quote.Text = vocQuote.Quote.Text.Replace(VocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text}</mark>");
+                vocQuote.Quote.Text = vocQuote.Quote.Text.Replace(VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1),
+                $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1)}</mark>");
+            }
+
+            if (VocVM.Voc.VocsIdioms != null) VocVM.Voc.VocsIdioms = VocVM.Voc.VocsIdioms.OrderBy(x => x.Idiom.Text.Length).ToList();
+            foreach (var vocIdiom in VocVM.Voc.VocsIdioms ?? Enumerable.Empty<VocsIdioms>())
+            {
+                vocIdiom.Idiom.Text = vocIdiom.Idiom.Text.Replace(VocVM.Voc.Text, $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text}</mark>");
+                vocIdiom.Idiom.Text = vocIdiom.Idiom.Text.Replace(VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1),
+                $"<mark style=\"background-color: #FCF3CF;\">{VocVM.Voc.Text.Substring(0, 1).ToUpper() + VocVM.Voc.Text.Substring(1)}</mark>");
+            }
         }
-    }
+        #endregion
 
-    //public async Task PlaySound()
-    //{
-    //    await JSRuntime.InvokeVoidAsync("playSound");
-    //}
-}
-<style>
-    .form-control-borderless {
-        border: none;
-    }
+        async Task Search()
+        {
+            if (string.IsNullOrEmpty(VocVM.Voc.Text.Trim()))
+            {
 
-        .form-control-borderless:hover, .form-control-borderless:active, .form-control-borderless:focus {
+            }
+            else
+            {
+                //VocVM.Exception = null;
+                //VocVM = await VocMasterService.GetVocVMByText(new VocVM { Voc = new Voc { Text = VocVM.Voc.Text } });
+                SearchResultVM = new SearchResultVM();
+                var vocvm = await VocService.GetVocVMByText(VocVM.Voc.Text.Trim());
+                SearchResultVM.Voc = vocvm.Voc;
+                SearchResultVM.Vids = await SearchResultService.GetVids(new VocVM { Voc = new Voc { Text = VocVM.Voc.Text.Trim() } });
+                SearchResultVM.Images = await SearchResultService.GetImages(new VocVM { Voc = new Voc { Text = VocVM.Voc.Text.Trim() } });
+
+
+                if (!string.IsNullOrEmpty(VocVM.Exception))
+                {
+                    await JSRuntime.Notfication(VocVM.Exception, IJSRuntimeExtensionMethods.SweetAlertMessageType.error, 10000);
+                    return;
+                }
+                await com_Dic.RefreshMe(VocVM.Voc.Text);
+                if (com_Videos != null) await com_Videos.RefreshMe(SearchResultVM);
+                await OptimizeVoc();
+            }
+        }
+
+        //public async Task PlaySound()
+        //{
+        //    await JSRuntime.InvokeVoidAsync("playSound");
+        //}
+    }
+    <style>
+        .form-control-borderless {
             border: none;
-            outline: none;
-            box-shadow: none;
         }
-</style>
+
+            .form-control-borderless:hover, .form-control-borderless:active, .form-control-borderless:focus {
+                border: none;
+                outline: none;
+                box-shadow: none;
+            }
+    </style>

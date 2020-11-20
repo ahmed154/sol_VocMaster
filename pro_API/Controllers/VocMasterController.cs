@@ -77,5 +77,36 @@ namespace pro_API.Controllers
                     Ex.InnerException.Message);
             }
         }
+        [HttpPost("GetImagesByText")]
+        public async Task<ActionResult<List<Image>>> GetImagesByText(VocVM vocVM)
+        {
+            try
+            {
+                if (vocVM == null) return BadRequest();
+
+                return await vocMasterRepository.GetImagesByText(vocVM);
+            }
+            catch (DbUpdateException Ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    Ex.InnerException.Message);
+            }
+        }
+
+        [HttpPost("GetVocSubtitlesByText")]
+        public async Task<ActionResult<List<VocSubtitle>>> GetVocSubtitlesByText(VocVM vocVM)
+        {
+            try
+            {
+                if (vocVM == null) return BadRequest();
+
+                return await vocMasterRepository.GetVocSubtitlesByText(vocVM);
+            }
+            catch (DbUpdateException Ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    Ex.InnerException.Message);
+            }
+        }
     }
 }

@@ -88,5 +88,39 @@ namespace pro_Server.Services
 
             return vocVM;
         }
+        public async Task<List<pro_Models.Models.Image>> GetImagesByText(VocVM vocVM)
+        {
+            List<pro_Models.Models.Image> images = new List<pro_Models.Models.Image>();
+
+            var response = await httpService.PostAsync($"{url}/GetImagesByText", vocVM);
+
+            if (response.Success)
+            {
+                images = await DeserializeAsync<List<pro_Models.Models.Image>>(response.HttpResponseMessage, defaultJsonSerializerOptions);
+            }
+            else
+            {
+                vocVM.Exception = response.HttpResponseMessage.Content.ToString();
+            }
+
+            return images;
+        }
+        public async Task<List<pro_Models.Models.VocSubtitle>> GetVocSubtitlesByText(VocVM vocVM)
+        {
+            List<pro_Models.Models.VocSubtitle> vocSubtitles = new List<pro_Models.Models.VocSubtitle>();
+
+            var response = await httpService.PostAsync($"{url}/GetVocSubtitlesByText", vocVM);
+
+            if (response.Success)
+            {
+                vocSubtitles = await DeserializeAsync<List<pro_Models.Models.VocSubtitle>>(response.HttpResponseMessage, defaultJsonSerializerOptions);
+            }
+            else
+            {
+                vocVM.Exception = response.HttpResponseMessage.Content.ToString();
+            }
+
+            return vocSubtitles;
+        }
     }
 }

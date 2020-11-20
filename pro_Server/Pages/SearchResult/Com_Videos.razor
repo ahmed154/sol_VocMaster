@@ -1,24 +1,13 @@
 ﻿
-<div style="margin-left:193px; margin-top:50px;">
-    @if (Voc.VocSubtitles == null)
-    {
-        <span>Loading...</span>
-    }
-    else if (Voc.VocSubtitles.Count == 0)
-    {
-        <span>There's no videos for this vocabulary.</span>
-    }
-    else if (Voc.VocSubtitles.Count > 0)
-    {
         @*<p id="demo">@TimerTicks</p>*@
         <div class="row">
-            <p>@(currentVocSubtitleIndex+1) of @Voc.VocSubtitles.Count video available</p>
+            <p>@(currentVocSubtitleIndex+1) of @SearchResultVM.Vids.Count video available</p>
         </div>
         <div class="row">
             @*<button @onclick=@(()=>onYouTubeIframeAPIReady())>onYouTubeIframeAPIReady</button>*@
             @*<button @onclick="stopVideo">stopVideo</button>*@
 
-            <button @onclick=@(()=> seekTo(Voc.VocSubtitles[currentVocSubtitleIndex].Subtitle.StartTime)) class="btn"><i class="fas fa-undo"></i></button>
+            <button @onclick=@(()=> seekTo(SearchResultVM.Vids[currentVocSubtitleIndex].StartTime)) class="btn"><i class="fas fa-undo"></i></button>
             <button @onclick="PrevVideo" class="btn"><i class="fas fa-chevron-circle-left"></i></button>
             <button @onclick="NextVideo" class="btn"><i class="fas fa-chevron-circle-right"></i></button>
         </div>
@@ -27,25 +16,23 @@
             <iframe id="existing-iframe-example"
                     width="640" height="360"
                     src=@($"https://www.youtube.com/embed/" +
-                          $"{Voc.VocSubtitles[currentVocSubtitleIndex].Subtitle.Movie.MovieId}" +
+                          $"{SearchResultVM.Vids[currentVocSubtitleIndex].YouTubeId}" +
                           $"?enablejsapi=1" +
-                          $"&start={(int)Voc.VocSubtitles[currentVocSubtitleIndex].Subtitle.StartTime}" +
+                          $"&start={(int)SearchResultVM.Vids[currentVocSubtitleIndex].StartTime}" +
                           $"&rel=0" +
                           $"&autoplay=1")
                     frameborder="0"
                     style="border: solid 4px #37474F">
             </iframe>
         </div>
-        <div class="row">
-            <h4>@((MarkupString)currentSubtitleText)</h4>
+        <div class="row mt-2">
+            <p style="width:640px;padding:2px;font-size:20px;">@((MarkupString)currentSubtitleText)</p>
         </div>
-    }
-</div>
 
 
 @code {
 
-    [Parameter] public Voc Voc { get; set; }
+    [Parameter] public SearchResultVM SearchResultVM { get; set; }
     [Inject] public IJSRuntime JSRuntime { get; set; }
 
     public int currentVocSubtitleIndex { get; set; }
@@ -74,7 +61,7 @@
     {
         while (true)
         {
-            if (Voc.VocSubtitles == null || Voc.VocSubtitles.Count == 0) continue;
+            if (SearchResultVM.Vids == null || SearchResultVM.Vids.Count == 0) continue;
 
             await Task.Delay(100);
 
@@ -82,21 +69,25 @@
 
             TimerTicks = currentTime;
 
+            if(0 <= currentVocSubtitleIndex && currentVocSubtitleIndex < SearchResultVM.Vids.Count)
+            {
+                var ss = SearchResultVM.Vids[currentVocSubtitleIndex].Subs.FirstOrDefault(x =>
+                (x.StartTime - 1) <= (int)TimerTicks &&
+                (x.EndTime - 1) > (int)TimerTicks);
 
-            var ss = Voc.VocSubtitles[currentVocSubtitleIndex].Subtitle.Movie.Subtitles.FirstOrDefault(x =>
-            x.StartTime <= (int)TimerTicks &&
-            x.EndtTime > (int)TimerTicks);
+                currentSubtitleText = (ss != null) ? ss.Text : string.Empty;
+                currentSubtitleText = currentSubtitleText.Replace(SearchResultVM.Voc.Text, $"<mark>{SearchResultVM.Voc.Text}</mark>");
 
-            currentSubtitleText = (ss != null) ? ss.Text : string.Empty;
-            currentSubtitleText = currentSubtitleText.Replace(Voc.Text, $"<mark>{Voc.Text}</mark>");
-            
-            StateHasChanged();
+                StateHasChanged();
+            }
         }
     }
     #endregion
-    public async Task RefreshMe(Voc voc)
+    public async Task RefreshMe(SearchResultVM searchResultVM)
     {
-        Voc = voc;
+        currentVocSubtitleIndex = 0;
+        SearchResultVM = searchResultVM;
+
         StateHasChanged();
     }
 
@@ -138,8 +129,8 @@
     }
     async Task NextVideo()
     {
-        if (Voc.VocSubtitles == null || Voc.VocSubtitles.Count == 0) return;
-        if (currentVocSubtitleIndex < Voc.VocSubtitles.Count - 1)
+        if (SearchResultVM.Vids == null || SearchResultVM.Vids.Count == 0) return;
+        if (currentVocSubtitleIndex < SearchResultVM.Vids.Count - 1)
         {
             currentVocSubtitleIndex++;
             //await JSRuntime.InvokeVoidAsync("playVideo");
@@ -147,7 +138,7 @@
     }
     async Task PrevVideo()
     {
-        if (Voc.VocSubtitles == null || Voc.VocSubtitles.Count == 0) return;
+        if (SearchResultVM.Vids == null || SearchResultVM.Vids.Count == 0) return;
         if (currentVocSubtitleIndex > 0)
         {
             currentVocSubtitleIndex--;

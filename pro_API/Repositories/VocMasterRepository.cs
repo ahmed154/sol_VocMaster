@@ -234,6 +234,7 @@ namespace pro_API.Repositories
             try
             {
                 vocVM.Voc = await appDbContext.Vocs
+                //.Where(x => x.Text == vocVM.Voc.Text)
                 //.Include(x => x.VocAudios)
                 //.Include(x => x.Definitions).ThenInclude(x => x.Examples)
                 //.Include(x => x.Synonyms)
@@ -259,12 +260,11 @@ namespace pro_API.Repositories
                     vocSubtitle.Subtitle.VocSubtitles = null;
                     //vocSubtitle.Subtitle.Movie.Subtitles = null;
                     //vocSubtitle.Subtitle.Movie.Text = null;
-                    foreach (var subtitle in vocSubtitle.Subtitle.Movie.Subtitles)
-                    {
-                        subtitle.Movie = null;
-                        subtitle.VocSubtitles = null;
-                    }
-
+                    //foreach (var subtitle in vocSubtitle.Subtitle.Movie.Subtitles)
+                    //{
+                    //    subtitle.Movie = null;
+                    //    subtitle.VocSubtitles = null;
+                    //}
                 }
                 foreach (var vocPhrase in vocVM.Voc.VocsPhrases ?? Enumerable.Empty<VocsPhrases>())
                 {
@@ -284,6 +284,39 @@ namespace pro_API.Repositories
                 }
             }
             return vocVM;
+        }
+        public async Task<List<Image>> GetImagesByText(VocVM vocVM)
+        {
+            List<Image> images = new List<Image>();
+
+            vocVM.Voc = await appDbContext.Vocs.FirstOrDefaultAsync(x => x.Text == vocVM.Voc.Text);
+            if(vocVM.Voc != null) images = await appDbContext.Images.Where(x => x.VocId == vocVM.Voc.Id).ToListAsync();
+
+            return images;
+        }
+        public async Task<List<VocSubtitle>> GetVocSubtitlesByText(VocVM vocVM)
+        {
+            List<VocSubtitle> vocSubtitles = new List<VocSubtitle>();
+
+            vocVM.Voc = appDbContext.Vocs.FirstOrDefault(x => x.Text == vocVM.Voc.Text);
+            if (vocVM.Voc != null)
+            {
+                vocSubtitles = await appDbContext.VocsSubtitless.Where(x => x.VocId == vocVM.Voc.Id).Include(x => x.Subtitle).ThenInclude(x => x.Movie).ThenInclude(x => x.Subtitles).ToListAsync();
+
+                foreach (var vocSubtitle in vocSubtitles)
+                {
+                    vocSubtitle.Voc = null;
+                    vocSubtitle.Subtitle.VocSubtitles = null;
+                    foreach (var subtitle in vocSubtitle.Subtitle.Movie.Subtitles)
+                    {
+                        subtitle.VocSubtitles = null;
+                        subtitle.Movie = null;
+                    }
+                }
+
+            }
+
+            return vocSubtitles;
         }
     }
 }

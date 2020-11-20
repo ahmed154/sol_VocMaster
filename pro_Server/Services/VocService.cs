@@ -90,6 +90,11 @@ namespace pro_Server.Services
             var response = await httpService.Get<VocVM>($"{url}/{id}");
             return await CheckDeserialize(response);
         }
+        public async Task<VocVM> GetVocVMByText(string txt)
+        {
+            var response = await httpService.PostAsync(url + "/GetVocVMByText", new VocVM { Voc = new Voc { Text = txt.Trim()} });
+            return await CheckDeserialize(response);
+        }
         public async Task<VocVM> CreateVoc(VocVM vocVM)
         {
             var response = await httpService.PostAsync(url, vocVM);

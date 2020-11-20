@@ -10,6 +10,7 @@ namespace pro_Models.ViewModels
     {
         [ValidateComplexType]
         public Image Image { get; set; } = new Image();
+        public Voc Voc { get; set; }
         public string UserName { get; set; }
         public string Exception { get; set; }
     }

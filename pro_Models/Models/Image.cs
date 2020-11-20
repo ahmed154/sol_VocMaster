@@ -17,7 +17,7 @@ namespace pro_Models.Models
         public bool Disliked { get; set; }
         public int VocId { get; set; }
         [Required]
-        public string UserId { get; set; }
+        public string UserName { get; set; }
         public bool Approved { get; set; } = false;
     }
 }

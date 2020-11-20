@@ -76,7 +76,7 @@ namespace pro_API.Controllers
         {
             try
             {
-                if (imageVM == null)return BadRequest();
+                if (imageVM == null) return BadRequest();
 
                 await imageRepository.CreateImage(imageVM);
 

@@ -15,5 +15,6 @@ namespace pro_Server.Services
         Task<VocVM> CreateVoc(VocVM vocVM);
         Task<VocVM> DeleteVoc(int id);
         Task<List<VocCardVM>> GetControlVocCardVMs(VocCardVM vocCardVM);
+        Task<VocVM> GetVocVMByText(string txt);
     }
 }

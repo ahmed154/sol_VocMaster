@@ -18,5 +18,6 @@ namespace pro_API.Repositories
         //Task<Voc> GetVocByName(string name);
         Task<Voc> GetVocByname(Voc voc);
         Task<List<VocCardVM>> GetControlVocCardVMs(VocCardVM vocCardVM);
+        Task<VocVM> GetVocVMByText(VocVM vocVM);
     }
 }

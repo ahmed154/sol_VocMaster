@@ -123,6 +123,11 @@ namespace pro_API.Repositories
             return await appDbContext.Vocs.Where(n => n.Text == voc.Text && n.Id != voc.Id)
                 .FirstOrDefaultAsync();
         }
+        public async Task<VocVM> GetVocVMByText(VocVM vocVM)
+        {
+            vocVM.Voc = await appDbContext.Vocs.FirstOrDefaultAsync(n => n.Text == vocVM.Voc.Text);
+            return vocVM;
+        }
 
 
         public async Task<List<VocCardVM>> GetControlVocCardVMs(VocCardVM vocCardVM)

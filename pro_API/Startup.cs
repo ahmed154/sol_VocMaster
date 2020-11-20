@@ -71,6 +71,7 @@ namespace pro_API
             services.AddScoped<IQuoteRepository, QuoteRepository>();
             services.AddScoped<IIdiomRepository, IdiomRepository>();
             services.AddScoped<IPhraseRepository, PhraseRepository>();
+            services.AddScoped<ISearchResultRepository, SearchResultRepository>();
 
         }
 

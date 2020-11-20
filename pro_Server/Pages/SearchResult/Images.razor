@@ -3,30 +3,27 @@
         <a href="" class="btn">Add Image</a>
     </div>
     <div class="row">
-        @if(Voc.Images != null)
+        @foreach (var image in SearchResultVM.Images)
         {
-            @foreach (var image in Voc.Images)
-            {
-                <div class="row ml-1 mt-1">
-                    <div class="col s12 m6">
-                        <div class="card p-1">
-                            <div class="card-image">
-                                <img src=@image.Uri>
-                            </div>
-                            <div class="card-content mt-2">
-                                <button @onclick=@(()=> Voc.Images.Remove(image)) class="btn shadow-none float-right"><i class="far fa-trash-alt"></i></button>
-                                <p style="max-width:270px">@image.Comment</p>
-                            </div>
+            <div class="row ml-1 mt-1">
+                <div class="col s12 m6">
+                    <div class="card p-1">
+                        <div class="card-image">
+                            <img src=@image.Uri>
+                        </div>
+                        <div class="card-content mt-2">
+                            <button @onclick=@(()=> SearchResultVM.Images.Remove(image)) class="btn shadow-none float-right"><i class="far fa-trash-alt"></i></button>
+                            <p style="max-width:270px">@image.Comment</p>
                         </div>
                     </div>
                 </div>
-            }
+            </div>
         }
     </div>
 </div>
 
 @code {
 
-    [Parameter] public Voc Voc { get; set; }
+    [Parameter] public SearchResultVM SearchResultVM { get; set; }
 
 }

@@ -74,6 +74,25 @@ namespace pro_API.Controllers
                     Ex.InnerException.Message);
             }
         }
+        [HttpPost("GetVocVMByText")]
+        public async Task<ActionResult<VocVM>> GetVocVMByText(VocVM vocVM)
+        {
+            try
+            {
+                if (vocVM == null || string.IsNullOrEmpty(vocVM.Voc.Text)) return NotFound();
+
+                var result = await vocRepository.GetVocVMByText(vocVM);
+
+                if (result == null) return NotFound();
+
+                return result;
+            }
+            catch (DbUpdateException Ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    Ex.InnerException.Message);
+            }
+        }
         [HttpPost]
         public async Task<ActionResult<VocVM>> CreateVoc(VocVM vocVM)
         {
