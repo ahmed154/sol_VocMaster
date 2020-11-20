@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <UserSecretsId>21b9bc43-9599-460d-a6a5-7720bd4aa0c8</UserSecretsId>
   </PropertyGroup>
@@ -24,13 +24,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorInputFile" Version="0.1.0-preview-00002" />
-    <PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="3.0.1" />
-    <PackageReference Include="iTextSharp.LGPLv2.Core" Version="1.6.7" />
+    <PackageReference Include="BlazorInputFile" Version="0.2.0" />
+    <PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="3.2.0" />
+    <PackageReference Include="iTextSharp.LGPLv2.Core" Version="1.7.0" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="3.2.0-preview3.20168.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Syncfusion.Blazor" Version="18.2.0.45" />
-    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="18.2.0.48" />
+    <PackageReference Include="Syncfusion.Blazor" Version="18.2.0.44" />
+    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="18.2.0.44" />
     <PackageReference Include="System.Threading.Timer" Version="4.3.0" />
   </ItemGroup>
 

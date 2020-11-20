@@ -10,16 +10,16 @@
 <AuthorizeView>
     <Authorized Context="user">
 
-        @*<AttAccountDropdown>
+        <AttAccountDropdown>
             <InitialTip><i class="far fa-user"></i>&ensp;@user.User.Identity.Name</InitialTip>
-        </AttAccountDropdown>*@
+        </AttAccountDropdown>
 
 
     </Authorized>
     <NotAuthorized Context="user">
 
 
-        @*<a href="/login" class="btn sign">Sign in</a>*@
+        <a href="/login" class="btn sign">Sign in</a>
 
 
         @*<a href="/login" style="background-color:transparent; color:#343a40; font-size: 12px;"> Log In</a> &ensp;

@@ -35,12 +35,12 @@
         <div class="col-auto"> <span style="font-size:30px;color:transparent">---------</span></div>
 
         <div class="col-8" style="margin-top: 17px;">
-            <button @onclick=@(()=> CloseTabs("Dictionary")) class="btn">Dictionary</button>
-            <button @onclick=@(()=> CloseTabs("Images")) class="btn">Images</button>
-            <button @onclick=@(()=> CloseTabs("Videos")) class="btn">Videos</button>
-            <button @onclick=@(()=> CloseTabs("Quotes")) class="btn">Quotes</button>
+            <button @onclick=@(()=> CloseTabs("Dictionary")) class="btn"><i class="fas fa-book"></i> Dictionary</button>
+            <button @onclick=@(()=> CloseTabs("Images")) class="btn"><i class="far fa-image"></i> Images</button>
+            <button @onclick=@(()=> CloseTabs("Videos")) class="btn"><i class="fab fa-youtube"></i> Videos</button>
+            @*<button @onclick=@(()=> CloseTabs("Quotes")) class="btn">Quotes</button>
             <button @onclick=@(()=> CloseTabs("Idioms")) class="btn">Idioms</button>
-            <button @onclick=@(()=> CloseTabs("Phrases")) class="btn">Phrases</button>
+            <button @onclick=@(()=> CloseTabs("Phrases")) class="btn">Phrases</button>*@
         </div>
     </div>
 </div>
@@ -190,6 +190,7 @@
             {
                 //VocVM.Exception = null;
                 //VocVM = await VocMasterService.GetVocVMByText(new VocVM { Voc = new Voc { Text = VocVM.Voc.Text } });
+                txt = VocVM.Voc.Text.Trim();
                 SearchResultVM = new SearchResultVM();
                 var vocvm = await VocService.GetVocVMByText(VocVM.Voc.Text.Trim());
                 SearchResultVM.Voc = vocvm.Voc;

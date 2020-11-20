@@ -19,8 +19,8 @@ var tim;
   function onYouTubeIframeAPIReady() {
         player = new YT.Player('existing-iframe-example', {
             events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
+                'onReady': onPlayerReady
+                //'onStateChange': onPlayerStateChange
             }
         });
   }
@@ -50,7 +50,7 @@ function changeBorderColor(playerStatus) {
     }
   }
   function onPlayerStateChange(event) {
-        changeBorderColor(event.data);
+        //changeBorderColor(event.data);
   }
 
 function seek(tim) {
