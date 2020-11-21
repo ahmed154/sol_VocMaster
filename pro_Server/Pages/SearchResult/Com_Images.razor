@@ -1,6 +1,6 @@
 ﻿
 <div class="row">
-    <button @onclick=@(()=> bol_AddImage = !bol_AddImage) class="btn mr-5">Add Image</button>
+    <button @onclick="AddImage" class="btn mr-5">Add Image</button>
 </div>
 
 @if (bol_AddImage)
@@ -149,6 +149,10 @@
         if (string.IsNullOrEmpty(UserName))
         {
             NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            bol_AddImage = !bol_AddImage;
         }
     }
     public async Task SaveImage(EditContext formContext)

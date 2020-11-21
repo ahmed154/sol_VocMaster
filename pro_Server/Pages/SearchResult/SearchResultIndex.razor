@@ -1,14 +1,17 @@
 ﻿@page "/search/{txt}"
 
 <div class="container-fluid">
-    <div class="row">
+    @* for LG and bigger *@
+    <div class="d-none d-lg-block">
+        <div class="row">
 
-        <a href="" class="col-auto" style="margin-top: 15px; text-decoration: none;">
-            <span style="font-size:30px;color:#1b292a">VocWiki</span>
-        </a>
+            <div class="col-auto mt-3">
+                <a href="" style="margin-top: 15px; text-decoration: none;">
+                    <span style="font-size:30px;color:#1b292a">VocWiki</span>
+                </a>
+            </div>
 
-        <div class="col-12 col-md-10 col-lg-8">
-            <div class="col-8" style="margin-top: 17px;">
+            <div class="col-6" style="margin-top: 17px;">
                 <EditForm Model="@VocVM" OnValidSubmit=@Search class="card card-sm">
                     <div class="row align-items-center" style="height: 45px;">
                         <div class="col">
@@ -22,73 +25,115 @@
                     </div>
                 </EditForm>
             </div>
-        </div>
 
-        <div class="col" style="border: thin; text-align: right; margin-top: 15px;">
-            <LoginDisplay />
+            <div class="col" style="border: thin; text-align: right; margin-top: 10px;">
+                <LoginDisplay />
+            </div>
+
         </div>
     </div>
-</div>
 
-<div class="container-fluid">
+    @* for MD and smaller *@
+    <div class="d-block d-lg-none">
+
+        <div class="row">
+            <div class="col">
+                <a href="" style="margin-top: 15px; text-decoration: none; float:left;">
+                    <span style="font-size:30px;color:#1b292a">VocWiki</span>
+                </a>
+                <div class="text-right" style="margin-top: 10px;">
+                    <LoginDisplay />
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <EditForm Model="@VocVM" OnValidSubmit=@Search class="card card-sm">
+                    <div class="row align-items-center" style="height: 45px;">
+                        <div class="col">
+                            <InputText @bind-Value="@VocVM.Voc.Text" class="form-control form-control-borderless" type="search" placeholder="Search In More Than 50,000 Vocabulary" />
+                        </div>
+
+                        <div class="col-auto form-control-borderless " style="margin-right:15px; border:none;">
+                            <button class="btn" type="submit"><i class="fas fa-search h4 text-body" style="margin-top:4px"></i></button>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+
+    </div>
+
     <div class="row">
-        <div class="col-auto"> <span style="font-size:30px;color:transparent">---------</span></div>
+        <div class="col-auto d-none d-lg-block"> <span style="font-size:30px;color:transparent">---------</span></div>
 
-        <div class="col-8" style="margin-top: 17px;">
+        <div class="col-10" style="margin-top: 17px;">
             <button @onclick=@(()=> CloseTabs("Dictionary")) class="btn"><i class="fas fa-book"></i> Dictionary</button>
             <button @onclick=@(()=> CloseTabs("Images")) class="btn"><i class="far fa-image"></i> Images</button>
             <button @onclick=@(()=> CloseTabs("Videos")) class="btn"><i class="fab fa-youtube"></i> Videos</button>
             @*<button @onclick=@(()=> CloseTabs("Quotes")) class="btn">Quotes</button>
-            <button @onclick=@(()=> CloseTabs("Idioms")) class="btn">Idioms</button>
-            <button @onclick=@(()=> CloseTabs("Phrases")) class="btn">Phrases</button>*@
+                <button @onclick=@(()=> CloseTabs("Idioms")) class="btn">Idioms</button>
+                <button @onclick=@(()=> CloseTabs("Phrases")) class="btn">Phrases</button>*@
         </div>
     </div>
-</div>
 
 
-<div style="margin-left:193px; margin-top:50px;">
-    @if (bol_Dictionary)
-    {
-        <Com_DictionaryApiDev Voc="VocVM.Voc" @ref="com_Dic" />
-    }
-    else if (bol_Images)
-    {
-        if (SearchResultVM.Images == null)
-        {
-            <span>Loading...</span>
-        }
-        else
-        {
-            <Com_Images SearchResultVM="SearchResultVM" />
-        }
-    }
-    else if (bol_Videos)
-    {
-        if (SearchResultVM.Vids == null)
-        {
-            <span>Loading...</span>
-        }
-        else if (SearchResultVM.Vids.Count == 0)
-        {
-            <span>There's no videos for this vocabulary.</span>
-        }
-        else
-        {
-            <Com_Videos SearchResultVM="SearchResultVM" @ref="com_Videos" />
-        }
-    }
-    else if (bol_Quotes)
-    {
-        <Com_Quotes Voc="VocVM.Voc" />
-    }
-    else if (bol_Idioms)
-    {
-        <Com_Idioms Voc="VocVM.Voc" />
-    }
-    else if (bol_Phrases)
-    {
-        <Phrases Voc="VocVM.Voc" />
-    }
+
+    @*<div style="margin-left:193px; margin-top:50px;">*@
+    <div class="row">
+        <div class="d-none d-lg-block" style="margin-left:170px;">
+            
+        </div>
+
+
+        <div class="col ml-2 mt-5">
+
+            @if (bol_Dictionary)
+            {
+                <Com_DictionaryApiDev Voc="VocVM.Voc" @ref="com_Dic" />
+            }
+            else if (bol_Images)
+            {
+                if (SearchResultVM.Images == null)
+                {
+                    <span>Loading...</span>
+                }
+                else
+                {
+                    <Com_Images SearchResultVM="SearchResultVM" />
+                }
+            }
+            else if (bol_Videos)
+            {
+                if (SearchResultVM.Vids == null)
+                {
+                    <span>Loading...</span>
+                }
+                else if (SearchResultVM.Vids.Count == 0)
+                {
+                    <span>There's no videos for this vocabulary.</span>
+                }
+                else
+                {
+                    <Com_Videos SearchResultVM="SearchResultVM" @ref="com_Videos" />
+                }
+            }
+            else if (bol_Quotes)
+            {
+                <Com_Quotes Voc="VocVM.Voc" />
+            }
+            else if (bol_Idioms)
+            {
+                <Com_Idioms Voc="VocVM.Voc" />
+            }
+            else if (bol_Phrases)
+            {
+                <Phrases Voc="VocVM.Voc" />
+            }
+        </div>
+
+    </div>
 </div>
 
     @code {
